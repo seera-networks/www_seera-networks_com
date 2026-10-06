@@ -392,7 +392,7 @@
     <nav class="main-nav" aria-label="Main">
       <ul>
         <li><button data-nav="home" aria-current="page"><span lang="en">Home</span><span lang="ja">ホーム</span></button></li>
-        <li><button data-nav="link">Link</button></li>
+        <li><button data-nav="portal">Portal</button></li>
         <li><button data-nav="camera">Camera</button></li>
         <li><button data-nav="compute"><span lang="en">Compute</span><span lang="ja">計算</span></button></li>
         <li><button data-nav="about"><span lang="en">About</span><span lang="ja">会社概要</span></button></li>
@@ -471,11 +471,12 @@
         <div class="head">
           <span class="kicker"><span lang="en">Products</span><span lang="ja">製品</span></span>
           <h2><span lang="en">Three products, one idea: share access, not data</span><span lang="ja">3つの製品、共通の考え方：渡すのはアクセスだけ</span></h2>
+          <p><span lang="en">ISEKAI Portal and ISEKAI Camera are built on <b>ISEKAI Link</b>, our connection layer: relay first, direct when possible, with access scoped to one service.</span><span lang="ja">ISEKAI PortalとISEKAI Cameraは、接続レイヤー<b>ISEKAI Link</b>の上に構築されています。まずリレーでつながり、可能なら直結し、アクセスは1つのサービス単位に限定されます。</span></p>
         </div>
         <div class="grid g3">
-          <button class="pcard" data-nav="link">
-            <span class="pcard-top"><span class="pcard-name">ISEKAI Link</span><span class="status live"><span lang="en">Beta</span><span lang="ja">ベータ版</span></span></span>
-            <span class="pcard-line"><span lang="en">Access to one service, not a whole network.</span><span lang="ja">ネットワーク全体ではなく、1つのサービスへのアクセス。</span></span>
+          <button class="pcard" data-nav="portal">
+            <span class="pcard-top"><span class="pcard-name">ISEKAI Portal</span><span class="status live"><span lang="en">Beta</span><span lang="ja">ベータ版</span></span></span>
+            <span class="pcard-line"><span lang="en">Reach one private service from anywhere: models on your own hardware, MCP servers, other agents.</span><span lang="ja">自前のハードウェア上のモデル、MCPサーバー、他社のエージェントなど、1つのプライベートサービスにどこからでもアクセス。</span></span>
             <span class="pcard-go"><span lang="en">Learn more</span><span lang="ja">詳しく見る</span> →</span>
           </button>
           <button class="pcard" data-nav="camera">
@@ -582,20 +583,20 @@
     </div>
   </section>
 
-  <!-- PRODUCT: LINK -->
-  <section data-page="link" hidden>
+  <!-- PRODUCT: PORTAL -->
+  <section data-page="portal" hidden>
     <div class="wrap page-header product-header">
       <span class="kicker"><span lang="en">Products</span><span lang="ja">製品</span></span>
-      <div class="title-row"><h1 class="product-name">ISEKAI <span>Link</span></h1><span class="status live"><span lang="en">Beta</span><span lang="ja">ベータ版</span></span></div>
-      <p><span lang="en">Secure access to one service behind someone else's NAT, for a person or an AI agent. Map a local port onto a TCP or UDP service anywhere, with no port opened at either end.</span><span lang="ja">他人のNATの内側にある1つのサービスへ、人やAIエージェントが安全にアクセス。どこにあるTCP/UDPサービスでもローカルポートに割り当てられ、どちらの側でもポート開放は不要です。</span></p>
+      <div class="title-row"><h1 class="product-name">ISEKAI <span>Portal</span></h1><span class="status live"><span lang="en">Beta</span><span lang="ja">ベータ版</span></span></div>
+      <p><span lang="en">Reach one private service from anywhere, for a person or an AI agent: a model on your own hardware, an MCP server, or another company's agent. Map a local port onto a TCP or UDP service anywhere, with no port opened at either end.</span><span lang="ja">自前のハードウェア上のモデル、MCPサーバー、他社のエージェントなど、1つのプライベートサービスへ、人やAIエージェントがどこからでもアクセス。どこにあるTCP/UDPサービスでもローカルポートに割り当てられ、どちらの側でもポート開放は不要です。</span></p>
     </div>
     <div class="section">
       <div class="wrap">
         <dl class="facts-grid">
           <div class="fact"><dt><span lang="en">Access</span><span lang="ja">アクセス</span></dt><dd><span lang="en">Grants to one named service, time-limited and revocable. No network to join.</span><span lang="ja">名前付きの1サービス単位で許可。期限付きで取り消し可能。ネットワークへの参加は不要。</span></dd></div>
-          <div class="fact"><dt><span lang="en">Path</span><span lang="ja">経路</span></dt><dd><span lang="en">Relay first, then a direct peer-to-peer path when one exists.</span><span lang="ja">まずリレーで接続し、可能ならP2Pで直結。</span></dd></div>
           <div class="fact"><dt><span lang="en">Platforms</span><span lang="ja">対応環境</span></dt><dd><span lang="en">Linux, macOS, Windows. Android in final review.</span><span lang="ja">Linux・macOS・Windows。Androidは最終レビュー中。</span></dd></div>
-          <div class="fact"><dt><span lang="en">Next</span><span lang="ja">今後</span></dt><dd><span lang="en">MCP servers and agent-to-agent connections.</span><span lang="ja">MCPサーバー対応、エージェント同士の接続。</span></dd></div>
+          <div class="fact"><dt><span lang="en">Use cases</span><span lang="ja">用途</span></dt><dd><span lang="en">Chat with a model on your own GPU or Jetson today. Next: MCP servers on a NAS, CRM or workstation, and agent-to-agent calls between companies.</span><span lang="ja">自前のGPUやJetson上のモデルとのチャット（提供中）。今後：NAS・CRM・ワークステーション上のMCPサーバー、企業間のエージェント同士の接続。</span></dd></div>
+          <div class="fact"><dt><span lang="en">Built on ISEKAI Link</span><span lang="ja">ISEKAI Linkの上に構築</span></dt><dd><span lang="en">The connection layer shared with ISEKAI Camera: relay first, then a direct peer-to-peer path when one exists, over encrypted QUIC.</span><span lang="ja">ISEKAI Cameraと共通の接続レイヤー。まずリレーで接続し、可能ならP2Pで直結。通信はQUICで暗号化されます。</span></dd></div>
         </dl>
       </div>
     </div>
@@ -630,7 +631,7 @@
           <div class="fact"><dt><span lang="en">Use cases</span><span lang="ja">用途</span></dt><dd><span lang="en">Robot teleoperation, remote monitoring, lab and field equipment.</span><span lang="ja">ロボットの遠隔操作、遠隔監視、研究室や現場の機器。</span></dd></div>
           <div class="fact"><dt><span lang="en">Path</span><span lang="ja">経路</span></dt><dd><span lang="en">Holds both relay and direct paths and shows which one is in use.</span><span lang="ja">リレーと直結の両方の経路を保持し、使用中の経路を表示。</span></dd></div>
           <div class="fact"><dt><span lang="en">Platforms</span><span lang="ja">対応環境</span></dt><dd><span lang="en">Desktop apps for Linux, macOS and Windows. iOS and Android viewers in development.</span><span lang="ja">Linux・macOS・Windows向けデスクトップアプリ。iOS・Androidのビューアを開発中。</span></dd></div>
-          <div class="fact"><dt><span lang="en">Pairing</span><span lang="ja">ペアリング</span></dt><dd><span lang="en">Viewers pair with a camera once; access can be revoked any time.</span><span lang="ja">ビューアは一度ペアリングするだけ。アクセスはいつでも取り消し可能。</span></dd></div>
+          <div class="fact"><dt><span lang="en">Pairing</span><span lang="ja">ペアリング</span></dt><dd><span lang="en">Viewers pair with a camera once; access can be revoked any time. Built on ISEKAI Link, like ISEKAI Portal.</span><span lang="ja">ビューアは一度ペアリングするだけ。アクセスはいつでも取り消し可能。ISEKAI Portalと同じくISEKAI Linkの上に構築。</span></dd></div>
         </dl>
       </div>
     </div>
@@ -645,7 +646,7 @@
         </div>
         <div class="head" style="margin:48px 0 16px"><span class="kicker" style="margin:0"><span lang="en">Other products</span><span lang="ja">その他の製品</span></span></div>
         <div class="others">
-          <button class="other" data-nav="link"><span class="other-name">ISEKAI Link</span><span class="other-line"><span lang="en">Access to one service, not a whole network.</span><span lang="ja">ネットワーク全体ではなく、1つのサービスへのアクセス。</span></span><span class="other-go" aria-hidden="true">→</span></button>
+          <button class="other" data-nav="portal"><span class="other-name">ISEKAI Portal</span><span class="other-line"><span lang="en">Reach one private service from anywhere.</span><span lang="ja">1つのプライベートサービスにどこからでもアクセス。</span></span><span class="other-go" aria-hidden="true">→</span></button>
           <button class="other" data-nav="compute"><span class="other-name"><span lang="en">ISEKAI Compute</span><span lang="ja">ISEKAI計算</span></span><span class="other-line"><span lang="en">Analyze data without ever handing it over.</span><span lang="ja">データを渡さずに分析・処理。</span></span><span class="other-go" aria-hidden="true">→</span></button>
         </div>
       </div>
@@ -720,7 +721,7 @@
         </div>
         <div class="head" style="margin:48px 0 16px"><span class="kicker" style="margin:0"><span lang="en">Other products</span><span lang="ja">その他の製品</span></span></div>
         <div class="others">
-          <button class="other" data-nav="link"><span class="other-name">ISEKAI Link</span><span class="other-line"><span lang="en">Access to one service, not a whole network.</span><span lang="ja">ネットワーク全体ではなく、1つのサービスへのアクセス。</span></span><span class="other-go" aria-hidden="true">→</span></button>
+          <button class="other" data-nav="portal"><span class="other-name">ISEKAI Portal</span><span class="other-line"><span lang="en">Reach one private service from anywhere.</span><span lang="ja">1つのプライベートサービスにどこからでもアクセス。</span></span><span class="other-go" aria-hidden="true">→</span></button>
           <button class="other" data-nav="camera"><span class="other-name">ISEKAI Camera</span><span class="other-line"><span lang="en">Live video from any machine, with no port opened.</span><span lang="ja">ポート開放なしで、どのマシンの映像もライブ視聴。</span></span><span class="other-go" aria-hidden="true">→</span></button>
         </div>
       </div>
@@ -731,7 +732,7 @@
   <section data-page="about" hidden>
     <div class="wrap page-header">
       <span class="kicker"><span lang="en">About</span><span lang="ja">会社概要</span></span>
-      <p><span lang="en">Seera Networks builds <a href="https://github.com/seera-networks/ISEKAI-link">ISEKAI Link</a>, which makes reaching a device or a service as simple as naming it.</span><span lang="ja">セーラ・ネットワークス株式会社では、（<a href="https://github.com/seera-networks/ISEKAI-link">ISEKAI link</a>）を開発し、デバイスやサービスへの接続を、名前を指定するだけのシンプルなものにします。</span></p>
+      <p><span lang="en">Seera Networks builds three products: ISEKAI Portal, ISEKAI Camera and ISEKAI Compute. Portal and Camera run on <a href="https://github.com/seera-networks/ISEKAI-link">ISEKAI Link</a>, our connection layer, which makes reaching a device or a service as simple as naming it.</span><span lang="ja">セーラ・ネットワークス株式会社は、ISEKAI Portal・ISEKAI Camera・ISEKAI計算の3つの製品を開発しています。PortalとCameraは接続レイヤー<a href="https://github.com/seera-networks/ISEKAI-link">ISEKAI Link</a>の上に構築され、デバイスやサービスへの接続を、名前を指定するだけのシンプルなものにします。</span></p>
     </div>
     <div class="section">
       <div class="wrap split">
@@ -1980,7 +1981,7 @@ QuicTestProbePath(
         <div class="card">
           <h3><span lang="en">What helps us reply quickly</span><span lang="ja">スムーズなご返信のために</span></h3>
           <ul class="checks">
-            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span lang="en">Which product: Link, Camera or Compute</span><span lang="ja">ご希望の製品（Link・Camera・ISEKAI計算）</span></li>
+            <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span lang="en">Which product: Portal, Camera or Compute</span><span lang="ja">ご希望の製品（Portal・Camera・ISEKAI計算）</span></li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span lang="en">The devices or services you want to reach</span><span lang="ja">接続したいデバイスやサービス</span></li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span lang="en">Where they run: OS, and the network they sit on</span><span lang="ja">動作環境（OSやネットワーク）</span></li>
             <li><svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M3 8.5l3 3 7-7" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg><span lang="en">Who needs access: people, AI agents, or both</span><span lang="ja">アクセスする主体（人・AIエージェント・両方）</span></li>
@@ -2001,7 +2002,7 @@ QuicTestProbePath(
       <div>
         <h4><span lang="en">Products</span><span lang="ja">製品</span></h4>
         <ul>
-          <li><button data-nav="link">ISEKAI Link</button></li>
+          <li><button data-nav="portal">ISEKAI Portal</button></li>
           <li><button data-nav="camera">ISEKAI Camera</button></li>
           <li><button data-nav="compute"><span lang="en">ISEKAI Compute</span><span lang="ja">ISEKAI計算</span></button></li>
         </ul>
@@ -2168,7 +2169,8 @@ QuicTestProbePath(
   setLang(saved || ((navigator.language || '').toLowerCase().startsWith('ja') ? 'ja' : 'en'));
 
   function routeFromHash(initial) {
-    const hash = location.hash.replace('#', '');
+    let hash = location.hash.replace('#', '');
+    if (hash === 'link') hash = 'portal';   // old links to the former "Link" page
     if (pages.includes(hash)) showPage(hash, null, true);
     else if (hash === 'products') showPage('home', 'home-products', true);
     else if (!initial) showPage('home', null, true);
