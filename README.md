@@ -30,6 +30,10 @@ python3 -m http.server 8000
 2. In Cloudflare DNS, set `www` to a **CNAME** pointing at `seera-networks.github.io`. Keep the redirect from `seera-networks.com` to `www`.
 3. Tick **Enforce HTTPS** in **Settings → Pages** once the domain check passes.
 
+## Analytics
+
+Visitor counts come from **Cloudflare Web Analytics** (no cookies, no fingerprinting): see the snippet just before `</body>` in `index.html`. The dashboard is in the Cloudflare account under **Analytics & Logs → Web Analytics → seera-networks.com**. The site token in the snippet is public by design. Ad blockers hide some visitors, so counts run a little low.
+
 ## Editing
 
 Each piece of text appears twice, as `<span lang="en">…</span><span lang="ja">…</span>`; keep both languages in step when you change copy.
