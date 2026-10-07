@@ -193,11 +193,14 @@
     .cflow-links { flex-direction: row; justify-content: center; gap: 28px; padding: 6px 0; }
     .cflow-link { flex-direction: row; align-items: center; gap: 10px; text-align: left; max-width: 46%; }
     .cflow-arrow { width: 2px; height: 34px; margin: 0; flex-shrink: 0; }
-    .cflow-arrow::after { top: auto; left: -5px; right: auto; border: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; }
+    /* Vertical arrowheads. Repeat the desktop selectors so their sideways borders don't leak in. */
+    .cflow-arrow::after,
+    .cflow-arrow.fwd::after, .cflow-arrow.back::after,
+    .cflow-arrow.muted.fwd::after, .cflow-arrow.muted.back::after { top: auto; bottom: auto; left: -5px; right: auto; border: 0; border-left: 6px solid transparent; border-right: 6px solid transparent; }
     .cflow-arrow.fwd::after { bottom: -2px; border-top: 9px solid var(--accent); }
     .cflow-arrow.back::after { top: -2px; border-bottom: 9px solid var(--accent); }
-    .cflow-arrow.muted.fwd::after { border-top-color: var(--muted); }
-    .cflow-arrow.muted.back::after { border-bottom-color: var(--muted); }
+    .cflow-arrow.muted.fwd::after { border-top: 9px solid var(--muted); }
+    .cflow-arrow.muted.back::after { border-bottom: 9px solid var(--muted); }
   }
   #home-products { scroll-margin-top: 64px; }
   .pcard { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; display: flex; flex-direction: column; gap: 12px; text-align: left; color: inherit; cursor: pointer; }
