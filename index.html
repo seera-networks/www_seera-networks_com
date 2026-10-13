@@ -820,7 +820,6 @@
         <a class="post" href="#post-8e4d8a0ce44aae" data-nav="post-8e4d8a0ce44aae">
           <time datetime="2026-09-27">2026-09-27</time>
           <div><h3><span lang="en">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span><span lang="ja">MASQUE越しにLLMチャットを流す：ISEKAI Portal クライアント</span></h3><p><span lang="en">The second ISEKAI link app: an Android chat client that reaches an Ollama model on a remote Jetson over the same MASQUE relay stack as the camera apps, and keeps the conversation going when the phone switches from Wi-Fi to 5G.</span><span lang="ja">ISEKAI linkの2つ目のアプリ。リモートのJetson上で動くOllamaに、カメラアプリと同じMASQUEリレー基盤で接続するAndroidチャットアプリです。Wi-Fiから5Gに切り替わっても会話が続きます。</span></p></div>
-          <span class="langtag"><span lang="en">English only</span><span lang="ja">英語のみ</span></span>
         </a>
         <a class="post" href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">
           <time datetime="2026-09-25">2026-09-25</time>
@@ -1122,12 +1121,12 @@
   <section data-page="post-8e4d8a0ce44aae" hidden>
     <div class="wrap page-header post-header">
       <button class="back-link" data-nav="blog"><span lang="en">← All posts</span><span lang="ja">← 記事一覧</span></button>
-      <h1><span lang="en">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span><span lang="ja">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span></h1>
-      <p class="post-meta"><time datetime="2026-09-27">2026-09-27</time><span lang="ja"> · この記事は英語のみです</span></p>
+      <h1><span lang="en">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span><span lang="ja">MASQUE越しにLLMチャットを流す：ISEKAI Portal クライアント</span></h1>
+      <p class="post-meta"><time datetime="2026-09-27">2026-09-27</time></p>
     </div>
     <div class="section post-body">
       <div class="wrap">
-        <article class="prose">
+        <article class="prose" lang="en">
 <h2>
  Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</h2>
 <p><a href="https://github.com/seera-networks/ISEKAI-link" target="_blank" rel="noopener">ISEKAI link</a> is Seera Networks' service for connecting devices on different networks over QUIC: it handles authentication and connection brokering, and relays traffic for peers that can't reach each other directly. The relay speaks MASQUE, the IETF's family of HTTP/3-based proxying protocols (here CONNECT-UDP, RFC 9298), so a peer's own QUIC connection travels tunneled inside the relay's. Its first application was a live-video camera pair, covered in the <a href="#post-3ff5f4507c6f69" data-nav="post-3ff5f4507c6f69">previous article</a>.</p>
@@ -1178,7 +1177,57 @@
 <p>The interesting result isn't the chat UI — it's that swapping "stream video frames" for "tunnel a stateless HTTP API" left the relay, the pairing model and the certificates untouched. Everything new sat on top of them: an inner ALPN, <code>portal-core</code>'s forwarding protocol, and a one-entry catalogue. On the client, the only transport-adjacent decisions were streaming the reply and a per-read timeout long enough to survive a cold model load. That's the bet the generic service-catalogue design was making, and it held.</p>
 
         </article>
-        <p class="post-source"><a lang="en" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae?locale=en" target="_blank" rel="noopener">Also published on Zenn</a><a lang="ja" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae" target="_blank" rel="noopener">Zennでも公開しています</a></p>
+        <article class="prose" lang="ja">
+<h2>
+ MASQUE越しにLLMチャットを流す：ISEKAI Portal クライアント</h2>
+<p><a href="https://github.com/seera-networks/ISEKAI-link" target="_blank" rel="noopener">ISEKAI link</a> は、異なるネットワーク上のデバイス同士を QUIC で接続するセーラ・ネットワークスのサービスです。認証と接続の仲介を行い、互いに直接到達できないピア同士の通信はリレーします。リレーは、IETF が標準化している HTTP/3 ベースのプロキシプロトコル群である MASQUE（ここでは CONNECT-UDP、RFC 9298）を話すため、ピア自身の QUIC 接続はリレーの QUIC 接続の中をトンネルされて流れます。最初のアプリケーションはライブ映像のカメラアプリの組で、<a href="#post-3ff5f4507c6f69" data-nav="post-3ff5f4507c6f69">前回の記事</a>で紹介しました。</p>
+<p>ISEKAI Portal クライアントはその2つ目のアプリで、一方向の映像ストリームではなく、リクエスト／レスポンス型の通信を運びます。リモートのマシン上でローカルに動いている <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> に、同じリレー基盤を通して HTTP リクエストを転送する、小さな Android チャットアプリです。カメラアプリと同じ転送プロトコルとセッション／リレーの仕組みを持つ <code>portal-core</code> と <code>isekai-p2p</code> の上に作られており、ISEKAI link の汎用的な側面を実証しています。映像専用の経路をハードコードする代わりに、運用者がカタログに名前付きのサービスを宣言すれば、ペアリング済みのピアはそれをローカルにあるかのように利用できます。</p>
+<div class="embed"><pre class="mermaid">flowchart LR
+  A[&quot;Android アプリ&lt;br/&gt;(チャット UI)&quot;] -- &quot;127.0.0.1 への HTTP&quot; --&gt; F[&quot;portal-client-ffi&lt;br/&gt;(ローカル転送)&quot;]
+  F -- &quot;内側の QUIC&lt;br/&gt;ALPN isekai-portal-v1&quot; --&gt; R[&quot;ISEKAI link リレー&lt;br/&gt;(MASQUE CONNECT-UDP)&quot;]
+  R --&gt; S[&quot;portal-server&lt;br/&gt;(Jetson)&quot;]
+  F -. &quot;直接経路（検証できた場合）&quot; .-&gt; S
+  S -- &quot;TCP&quot; --&gt; O[&quot;Ollama&lt;br/&gt;127.0.0.1:11434&quot;]</pre></div><p>すべてのセッションはまずリレー経由で始まり、直接経路が検証できた時点でそちらに移ります。下のデモでは、スマートフォンは最初 Jetson と同じ Wi-Fi ネットワーク上にあり、5G に切り替わった後に再接続したセッションはリレー経由のままです。</p>
+<p><img src="assets/blog-3cd82d93247e-20260926.gif" alt="" loading="lazy"></p>
+<p><em>Android スマートフォンが Jetson とペアリングし、Wi-Fi 経由で2つ質問した後、セッションの途中で 5G に切り替えます。アプリはリレー経由で再接続し、続けて送った質問にはチャット履歴を踏まえた答えが返ってきます。</em></p>
+<h2>
+ リレーはそのまま、ストリームの形を変える</h2>
+<p><code>portal-core</code> の転送モデルは意図的に汎用的に作られています。TCP 接続1本につき双方向の QUIC ストリームを1本、UDP にはセッション ID をキーにしたデータグラムを使います。これは、フレームごとに単方向ストリームを1本使う <code>camera-client</code> の設計とは異なる形です。ここには「古いフレームを捨てる」ロジックはありません。チャットのリクエストはライブメディアではなく、たまたまトンネルされているだけの通常のリクエスト／レスポンス型の HTTP のやり取りだからです。その下にあるリレー、証明書、ペアリング（<code>isekai-p2p</code>）は、変更なしで両方に使えます。portal はカメラの P2P プロトコル文字列まで再利用しています。portal が追加したものはその上に乗っています。独自の内側の ALPN（<code>isekai-portal-v1</code>。映像も portal も話さないピアは、ストリームの途中ではなくハンドシェイクの時点で失敗します）、<code>portal-core</code> の転送プロトコル、そしてサービスカタログです。</p>
+<h2>
+ カタログがポリシーのすべて</h2>
+<p>今回のビルドは NVIDIA <a href="https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/" target="_blank" rel="noopener">Jetson Orin Nano</a> 上で動いています。机の上に置ける小さなエッジボードでありながら、ローカル LLM を動かせるだけの GPU を備えています。ただし、設計はこのボードに依存していません。Mac mini や AMD Ryzen AI Halo など、モデルを動かせるオンプレミスのマシンであれば同じように使えます。Jetson では <code>portal-server</code> が動いており、エントリが1つだけのサービスカタログを指定して起動しています。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">[</span><span style="color:#B392F0">service</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">ollama</span><span style="color:#E1E4E8">]</span></span>
+<span><span style="color:#E1E4E8">protocol = </span><span style="color:#9ECBFF">"tcp"</span></span>
+<span><span style="color:#E1E4E8">target = </span><span style="color:#9ECBFF">"127.0.0.1:11434"</span></span>
+<span></span></code></pre></div><p>クライアントはサービスを（アドレスではなく）<strong>名前で</strong>（"ollama"）要求します。そのため、ペアリング済みのピアが到達できるのはカタログが明示的に提供するものだけで、接続を始める側が任意の接続先を指定することはできません。このカタログは、あえて <code>portal-server</code> のデフォルトの設定ファイルのパス／名前にはしていません。Ollama には独自の認証がないためです。<code>--config</code> を付け忘れた運用者のもとで黙ってカタログが読み込まれてしまうと、生のローカル LLM エンドポイントをペアリング済みのすべてのピアに渡すことになります。</p>
+<p>カタログが線を引くのはポートの単位であって、リクエストの単位ではありません。転送は単純なレイヤー4で、<code>portal-server</code> はトンネルと <code>127.0.0.1:11434</code> の間でバイト列を読まずにコピーします。そのため、ペアリング済みのピアは Ollama の API 全体を使えます。<code>/api/chat</code> だけでなく、<code>/api/pull</code>、<code>/api/delete</code>、<code>/api/create</code> もです。エンドポイント単位で制限するには Ollama の前に HTTP を解釈するプロキシが必要で、それはこのレイヤーの役割の外です。この設計が制御しているのは、誰が入れるかと、ポートがどこにあるかです。トンネルを開けるのは、運用者が発行したペアリングコード（有効期限は最大5分で、後から <code>portal-server --revoke</code> で取り消せます）を使ったピアだけで、Ollama は <code>127.0.0.1</code> にバインドされたままなので、LAN に公開されることはありません。</p>
+<h2>
+ 生存確認としてのストリーミング</h2>
+<p>最初に動いたバージョンでは Ollama の <code>stream: false</code> を使い、返答全体を待っていました。これは単に壊れているように見えただけではありません。トンネル越しに1分以上無通信が続くと、ストリーミングしない返答はそのまま失敗していました。<code>stream: true</code>（Ollama の改行区切り JSON によるストリーミング形式）に切り替えることで、全体のレイテンシーは変えずに問題が解決しました。変わったのは最初のトークンが届くまでの時間です。モデルが生成している間、実際のバイト列がトンネルを途切れなく流れるようになりました。これは、経路を無通信にせずリレーのキープアライブを流し続けるという<a href="#post-3ff5f4507c6f69" data-nav="post-3ff5f4507c6f69">カメラ製品</a>の判断と同じ原則です。アプリは今でも1回の読み取りに90秒を許容しています。モデルのコールドロードだけで Jetson では約40秒かかったため、それをカバーできる長さです。</p>
+<h2>
+ モデルの選択は設定文字列ひとつ</h2>
+<p>今回動かしているモデルは <code>qwen3.5:4b</code> です。これを選んだのは、この Jetson Orin Nano のユニファイドメモリ（CPU と GPU で共有）に、同じマシン上の他のすべてと一緒に無理なく収まるからであって、Ollama より上流の何かがモデルの種類を気にしているからではありません。<code>portal-core</code> の転送も、クライアントの HTTP レイヤーも、モデル名は <code>/api/chat</code> のリクエストボディでそのまま渡すだけで、中身を見ていません。想定するオンプレミスの GPU／NPU ハードウェアに収まりさえすれば、どのオープンウェイトモデルでもそのまま置き換えられます。トレードオフは完全にローカルなもの（メモリ予算、コールドロード時間、トークン毎秒）であって、アーキテクチャ上のものではありません。</p>
+<p>サーバー自体についても同じことが言えます。ここで Ollama は特別な存在ではありません。カタログの接続先を <a href="https://lemonade-server.ai/" target="_blank" rel="noopener">Lemonade Server</a> にすることもできます。Lemonade Server は、LLM によるチャットに加えて画像生成・音声・埋め込みなどの AI モデルを自分の PC 上で動かし、標準的な OpenAI 互換 API で提供するオープンソースのサーバーで、Windows・macOS・Linux で動作します。必要なのは、<code>127.0.0.1</code> 上のそのポートを指す <code>[service.lemonade]</code> のエントリを追加することだけです。アプリは <code>/api/chat</code> の代わりに <code>/api/v1/chat/completions</code> にリクエストを送るようになり、リレー、ペアリング、転送はまったく変わりません。</p>
+<h2>
+ マルチターンの記憶は保存ではなく再送</h2>
+<p>Ollama は <code>/api/generate</code> でも <code>/api/chat</code> でもリクエスト間で状態を保持しません。覚えておいてほしいことは、クライアントがすべて再送する必要があります。このアプリの最初のバージョンはそうしていませんでした。すべてのリクエストを、そのターンのテキストだけを付けて <code>/api/generate</code> に送っていたため、どの返答も、事実上モデルが初めて見たメッセージへの返答になっていました。</p>
+<p>修正では、クライアントを <code>/api/chat</code> に切り替え、毎ターン会話全体を、新しい質問を最後にして再送するようにしました。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">"model"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"qwen3.5:4b"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"stream"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"messages"</span><span style="color:#E1E4E8">: [</span></span>
+<span><span style="color:#E1E4E8">  {</span><span style="color:#79B8FF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"user"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"whats your model"</span><span style="color:#E1E4E8">},</span></span>
+<span><span style="color:#E1E4E8">  {</span><span style="color:#79B8FF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"assistant"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"I am Qwen3.5."</span><span style="color:#E1E4E8">},</span></span>
+<span><span style="color:#E1E4E8">  {</span><span style="color:#79B8FF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"user"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"what was the question I asked previously?"</span><span style="color:#E1E4E8">}</span></span>
+<span><span style="color:#E1E4E8">]}</span></span>
+<span></span></code></pre></div><p>ストリーミングされる各行のテキストは、<code>/api/generate</code> のフラットな <code>response</code> フィールドではなく、<code>message.content</code> に入って届きます。</p>
+<p>もっともらしい続きではなく、記憶していることを証明できる最も単純なテストで確認しました。1つ目のメッセージでモデルに「My favorite color is teal.」（好きな色はティール）と伝え、別のメッセージで「What is my favorite color?」（私の好きな色は？）と尋ねると、「Teal.」と返ってきました。</p>
+<p>これで残るトレードオフがあります。アプリ自身は会話の切り詰めを一切行わないため、毎ターン会話全体が再送されます。モデルが実際にそのうちどれだけを見られるかは、Ollama 側のコンテキストウィンドウの設定（<code>num_ctx</code>）で上限が決まります。それを超えると Ollama は古いターンから黙って捨てるため、十分に長いチャットでは、いずれティールのテストに失敗します。<code>num_ctx</code> を上げればその時点を先に延ばせますが、値はローカルのハードウェアに合わせて決めるべきです。コンテキストウィンドウが大きいほど KV キャッシュも大きくなり、モデル自体と同じメモリを奪い合うからです。デモの範囲としてはこれで十分ですが、実運用では独自の切り詰めや要約の戦略が必要になるでしょう。</p>
+<h2>
+ 認証はそっくり受け継ぐ</h2>
+<p>エンドポイント鍵と Auth0 のデバイスフローによるペアリングモデルは、<code>camera-client</code> とまったく同じです。初回起動時に新しい ECDSA 鍵を生成してアプリのプライベートストレージに保存し、Auth0 でサインインします。ペアリングの Grant はセッションではなく Endpoint ID に紐づくため、Jetson 上の <code>portal-server</code> を再起動しても、ペアリングし直す必要はありません。</p>
+<h2>
+ 設計思想</h2>
+<p>興味深い結果は、チャット UI ではありません。「映像フレームをストリーミングする」を「ステートレスな HTTP API をトンネルする」に置き換えても、リレー、ペアリングモデル、証明書には手を入れずに済んだことです。新しく加えたものはすべてその上に乗っています。内側の ALPN、<code>portal-core</code> の転送プロトコル、そしてエントリが1つのカタログです。クライアント側でトランスポートに関わる判断は、返答をストリーミングすることと、モデルのコールドロードを乗り切れるだけの長さの読み取りタイムアウトを設けることだけでした。汎用的なサービスカタログという設計はこの点に賭けており、その賭けは当たりました。</p>
+        </article>
+        <p class="post-source"><a lang="en" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae?locale=en" target="_blank" rel="noopener">Also published on Zenn</a><a lang="ja" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae" target="_blank" rel="noopener">Zennでも公開しています（英語）</a></p>
       </div>
     </div>
   </section>
