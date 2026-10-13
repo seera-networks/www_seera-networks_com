@@ -1194,7 +1194,7 @@
  リレーはそのまま、ストリームの形を変える</h2>
 <p><code>portal-core</code> の転送モデルは意図的に汎用的に作られています。TCP 接続1本につき双方向の QUIC ストリームを1本、UDP にはセッション ID をキーにしたデータグラムを使います。これは、フレームごとに単方向ストリームを1本使う <code>camera-client</code> の設計とは異なる形です。ここには「古いフレームを捨てる」ロジックはありません。チャットのリクエストはライブメディアではなく、たまたまトンネルされているだけの通常のリクエスト／レスポンス型の HTTP のやり取りだからです。その下にあるリレー、証明書、ペアリング（<code>isekai-p2p</code>）は、変更なしで両方に使えます。portal はカメラの P2P プロトコル文字列まで再利用しています。portal が追加したものはその上に乗っています。独自の内側の ALPN（<code>isekai-portal-v1</code>。映像も portal も話さないピアは、ストリームの途中ではなくハンドシェイクの時点で失敗します）、<code>portal-core</code> の転送プロトコル、そしてサービスカタログです。</p>
 <h2>
- カタログがポリシーのすべて</h2>
+ ポリシーはカタログがすべて</h2>
 <p>今回のビルドは NVIDIA <a href="https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/" target="_blank" rel="noopener">Jetson Orin Nano</a> 上で動いています。机の上に置ける小さなエッジボードでありながら、ローカル LLM を動かせるだけの GPU を備えています。ただし、設計はこのボードに依存していません。Mac mini や AMD Ryzen AI Halo など、モデルを動かせるオンプレミスのマシンであれば同じように使えます。Jetson では <code>portal-server</code> が動いており、エントリが1つだけのサービスカタログを指定して起動しています。</p>
 <div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">[</span><span style="color:#B392F0">service</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">ollama</span><span style="color:#E1E4E8">]</span></span>
 <span><span style="color:#E1E4E8">protocol = </span><span style="color:#9ECBFF">"tcp"</span></span>
