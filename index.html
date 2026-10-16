@@ -276,6 +276,9 @@
   .prose summary { cursor: pointer; color: var(--ink); font-weight: 600; }
   .prose details[open] summary { margin-bottom: 10px; }
   .prose .embed { display: block; }
+  .prose pre .diff.add { display: inline-block; min-width: 100%; background: rgba(82,160,149,0.18); }
+  .prose pre .diff.remove { display: inline-block; min-width: 100%; background: rgba(240,165,140,0.14); }
+  .prose pre .diff-prefix { user-select: none; opacity: 0.7; }
   .prose pre.mermaid { background: var(--card); text-align: center; white-space: pre; color: var(--muted); font-size: 13px; }
   .prose pre.mermaid[data-processed] { color: inherit; }
   .prose pre.mermaid svg { max-width: 100%; height: auto; }
@@ -810,10 +813,13 @@
     </div>
     <div class="section">
       <div class="wrap posts">
+        <a class="post" href="#post-9bb592ca7b575a" data-nav="post-9bb592ca7b575a">
+          <time datetime="2026-10-08">2026-10-08</time>
+          <div><h3><span lang="en">Communicating via A2A through ISEKAI portal</span><span lang="ja">ISEKAI portal経由でA2Aでやり取りする</span></h3><p><span lang="en">A hands-on walkthrough: an A2A agent on Linux is reached from a2acli on Windows through ISEKAI portal, with no inbound ports opened and access limited by a time-bound Grant to a single client.</span><span lang="ja">Linux上のA2Aエージェントに、Windows上のa2acliからISEKAI portal経由で接続する手順を紹介します。外部からの接続を受け付ける設定は一切不要で、期限付きのGrantを発行した相手だけが接続できます。</span></p></div>
+        </a>
         <a class="post" href="#post-8e4d8a0ce44aae" data-nav="post-8e4d8a0ce44aae">
           <time datetime="2026-09-27">2026-09-27</time>
           <div><h3><span lang="en">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span><span lang="ja">MASQUE越しにLLMチャットを流す：ISEKAI Portal クライアント</span></h3><p><span lang="en">The second ISEKAI link app: an Android chat client that reaches an Ollama model on a remote Jetson over the same MASQUE relay stack as the camera apps, and keeps the conversation going when the phone switches from Wi-Fi to 5G.</span><span lang="ja">ISEKAI linkの2つ目のアプリ。リモートのJetson上で動くOllamaに、カメラアプリと同じMASQUEリレー基盤で接続するAndroidチャットアプリです。Wi-Fiから5Gに切り替わっても会話が続きます。</span></p></div>
-          <span class="langtag"><span lang="en">English only</span><span lang="ja">英語のみ</span></span>
         </a>
         <a class="post" href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">
           <time datetime="2026-09-25">2026-09-25</time>
@@ -836,15 +842,291 @@
   </section>
 
   <!-- BLOG POSTS (copied from zenn.dev/seera) -->
-  <section data-page="post-8e4d8a0ce44aae" hidden>
+  <section data-page="post-9bb592ca7b575a" hidden>
     <div class="wrap page-header post-header">
       <button class="back-link" data-nav="blog"><span lang="en">← All posts</span><span lang="ja">← 記事一覧</span></button>
-      <h1><span lang="en">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span><span lang="ja">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span></h1>
-      <p class="post-meta"><time datetime="2026-09-27">2026-09-27</time><span lang="ja"> · この記事は英語のみです</span></p>
+      <h1><span lang="en">Communicating via A2A through ISEKAI portal</span><span lang="ja">ISEKAI portal経由でA2Aでやり取りする</span></h1>
+      <p class="post-meta"><time datetime="2026-10-08">2026-10-08</time></p>
     </div>
     <div class="section post-body">
       <div class="wrap">
-        <article class="prose">
+        <article class="prose" lang="en">
+<p>A2A (Agent2Agent) is a protocol for AI agents to collaborate with each other. By using A2A, it becomes possible for AI agents built by different vendors or with different frameworks to communicate with each other. As an example of such communication, one could imagine a scenario where an internal "accounting agent" (client) requests a "tax check agent" (remote) operated by an external tax accountant firm to check monthly journal entries.</p>
+<p>In this example, let's say the external tax accountant firm does not want to expose the tax check agent publicly on the internet. To meet such needs, Seera Networks, Inc. has developed and released <a href="#portal" data-nav="portal">ISEKAI portal</a>. ISEKAI portal is an application that runs on top of ISEKAI link, whose mechanism was introduced in a <a href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">past article</a>. In this article, as a demonstration, I would like to introduce an example of connecting to helloworld-server included in <a href="https://github.com/a2aproject/a2a-rs" target="_blank" rel="noopener">a2a-rs</a>, which is an implementation of A2A written in Rust, via ISEKAI portal using a2acli, which is also included in a2a-rs.<br>
+<img src="assets/blog-c30c84fba882-20261007.gif" alt="Connecting from a2acli via portal" loading="lazy"></p>
+<p>Note that terms from ISEKAI link such as Endpoint and Grant appear in this article. An Endpoint is an endpoint identified by a key, and a Grant is a time-limited permission that allows a specific Endpoint to connect to a Listener. A Listener is a gateway through which portal-server, etc. waits for connections. For details, please refer to the <a href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">past article</a>.</p>
+<p>Also, since we use a2a-rs, both the local Windows environment and the remote Linux environment need the Rust toolchain and git. On Windows, MSVC build tools (Visual Studio Build Tools) are also required.</p>
+<h2 id="a2a-en-1">
+ Installing ISEKAI portal</h2>
+<p>Since ISEKAI portal publishes its source code under the MIT license, you can clone the <a href="https://github.com/seera-networks/ISEKAI-link/" target="_blank" rel="noopener">repository</a> and build it yourself. However, since the <a href="https://github.com/seera-networks/ISEKAI-link/blob/main/docs/Build.md" target="_blank" rel="noopener">build process</a> is a bit of a hassle, it is convenient to download pre-built binaries from <a href="https://github.com/seera-networks/ISEKAI-link/releases" target="_blank" rel="noopener">Releases</a>. Currently, binaries are available for the following three platforms:</p>
+<ul>
+<li>Windows (amd64)</li>
+<li>Linux (Ubuntu, amd64)</li>
+<li>Mac (arm64)</li>
+</ul>
+<p>All binaries are provided in zip format, and when extracted, a directory with the same name as the file is created (on Windows, portal-windows-latest), so add it to your PATH. Now you are ready to run it from the terminal.</p>
+<h2 id="a2a-en-2">
+ Setting up ISEKAI portal</h2>
+<p>Once installed, perform the setup. In the following, I will explain under the assumption that the server runs on Linux and the client runs on Windows.</p>
+<h3 id="a2a-en-3">
+ Setting up portal-server</h3>
+<h4 id="a2a-en-4">
+ Preparation for setup</h4>
+<p>If you are accessing the Linux machine running the server remotely, forward TCP port 38700 locally using ssh as follows.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> ssh </span><span style="color:#F97583">-</span><span style="color:#E1E4E8">L </span><span style="color:#79B8FF">38700</span><span style="color:#E1E4E8">:</span><span style="color:#79B8FF">127.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0.1</span><span style="color:#E1E4E8">:</span><span style="color:#79B8FF">38700</span><span style="color:#E1E4E8"> foo@bar.example.com</span></span>
+<span></span></code></pre></div><p>As described later, login must be performed via a web browser, and after logging in, the web browser connects to TCP port 38700 opened by portal-server. When accessing remotely, however, TCP port 38700 is open on the remote Linux machine, so it needs to be forwarded to the local environment. This step is not necessary if you are operating Linux locally.</p>
+<p>Also, create a directory to store the configuration files used by ISEKAI portal.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> mkdir</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal</span></span>
+<span></span></code></pre></div><h4 id="a2a-en-5">
+ Agreeing to the privacy policy</h4>
+<p>Using ISEKAI link requires signing up, and at that time you are asked to agree to the privacy policy that defines how personal information collected is handled. When you start portal-server, the privacy policy is displayed, so please review it and run the following command to agree. Until agreement is given, portal-server will display the privacy policy and exit.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> portal-server</span><span style="color:#79B8FF"> --accept-privacy-policy</span></span>
+<span></span></code></pre></div><p>The privacy policy is also published on the web (<a href="https://github.com/seera-networks/ISEKAI-link/blob/main/docs/privacy-policy.ja.md" target="_blank" rel="noopener">Japanese version</a> and <a href="https://github.com/seera-networks/ISEKAI-link/blob/main/docs/privacy-policy.en.md" target="_blank" rel="noopener">English version</a>).</p>
+<h4 id="a2a-en-6">
+ Logging in</h4>
+<p>ISEKAI link uses Auth0 for account management. Logging in is required to use it. To log in, run the following command (the --key option specifies the file of the Endpoint's private key, but since the file that stores login information is created in the same directory, it is also specified here).</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> portal-server</span><span style="color:#79B8FF"> --key</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal/portal-server.pem</span><span style="color:#79B8FF"> --login</span></span>
+<span></span></code></pre></div><p>When started, a URL is displayed, so access it with a web browser. When you access it, a screen saying "Enter Your Organization" appears, so click "Continue with personal account." Then a login screen saying "Welcome" appears, so if you already have an account, log in. If you do not have an account, click "Sign up" to move to the account creation screen. An account can be created with an email address and password, but it can also be created with a Google account or a GitHub account.</p>
+<h4 id="a2a-en-7">
+ Creating the configuration file</h4>
+<p>In ISEKAI portal, the connection destination is specified by the service name. The portal-server configuration file is used for this setting. Here, save it as ~/.config/ISEKAI-portal/portal-server.toml with the following contents.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">[</span><span style="color:#B392F0">service</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">a2a</span><span style="color:#E1E4E8">]</span></span>
+<span><span style="color:#E1E4E8">protocol = </span><span style="color:#9ECBFF">"tcp"</span></span>
+<span><span style="color:#E1E4E8">target   = </span><span style="color:#9ECBFF">"127.0.0.1:3000"</span></span>
+<span></span></code></pre></div><h4 id="a2a-en-8">
+ Starting portal-server</h4>
+<p>Now that preparation for startup is complete, run portal-server as follows. --key specifies the path to the private key; if the file does not exist, a private key is generated. If the file exists, the private key is read from it. --register must be specified if the Endpoint is not yet registered. On the first startup, a private key is generated and a new Endpoint is created, so --register is required. From the second time onward, do not add it (adding it will cause an error).</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> portal-server</span><span style="color:#79B8FF"> --key</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal/portal-server.pem</span><span style="color:#79B8FF"> --config</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal/portal-server.toml</span><span style="color:#79B8FF"> --register</span></span>
+<span></span></code></pre></div><h3 id="a2a-en-9">
+ Setting up portal-client</h3>
+<p>The setup for portal-client is almost the same as for portal-server. First, create a directory (folder) to store the configuration file.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> mkdir </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal</span></span>
+<span></span></code></pre></div><p>Next, log in while agreeing to the privacy policy. Note that from the second time onward, such as when you want to log in with a different account, --accept-privacy-policy is not necessary.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">key </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal\portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client.pem </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">login </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">accept</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">privacy</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">policy</span></span>
+<span></span></code></pre></div><p>Enter the URL output as before into a web browser and log in (for organization selection, click "Continue with personal account"). Here, use the account created earlier to log in (since it can be configured to accept connections from Endpoints of different users, there is no problem with creating a new separate account).</p>
+<p>Finally, find out the Endpoint ID.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">key </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal\portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client.pem </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">whoami</span></span>
+<span></span></code></pre></div><p>A string starting with "ep:" is output, and this is the Endpoint ID. It will be needed when creating a Grant, so make a note of it.</p>
+<h3 id="a2a-en-10">
+ Issuing a Grant</h3>
+<p>There are various ways to issue a Grant, but here I will introduce how to issue one manually from the dashboard. This method can be used as long as the destination portal-server is running.</p>
+<p>First, access the <a href="https://dashboard.isekai.tools/" target="_blank" rel="noopener">ISEKAI link dashboard</a> with a web browser. Since login is required, enter the information of the account you are logged in with on portal-server (as mentioned repeatedly, for organization selection, click "Continue with personal account").</p>
+<p>Once logged in, a menu appears at the top, so click "Grant" ("Grants" in the English version). You will move to the Grant screen, so fill in the "Create a grant" form ("Grantを作る" in the Japanese version). The Listener should be listed among those displayed when portal-server was started during setup, so select it. In the text input for "Endpoint to let in" ("入れる相手の Endpoint" in the Japanese version), enter the Endpoint ID of portal-client that you noted earlier. "Lifetime" ("寿命" in the Japanese version) is the expiration period of the Grant to be created. Choose from 1 hour, 8 hours, or 24 hours. The "Label" text input ("ラベル" in the Japanese version) allows you to enter a memo for your own management. Here, enter "a2a". Once you have finished entering the information, click the "Create grant" button ("Grant を作る").</p>
+<p>This completes the setup.</p>
+<h2 id="a2a-en-11">
+ Actually connecting</h2>
+<p>First, start portal-client on the local Windows machine and connect to portal-server on the remote Linux machine. --register is required only on the first startup (adding it from the second time onward will cause an error). The meaning of the --map argument is to accept connections on TCP port 3000 of the local host and forward those connections to the a2a destination specified by portal-server. The reason portal-client listens on TCP port 3000 is that a2acli's default connection destination is TCP port 3000.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">key </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal\portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client.pem </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">map </span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">:a2a </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">register</span></span>
+<span></span></code></pre></div><p>After starting, if the following string is output, it is successful.</p>
+<div class="code-block-container"><pre><code><span><span>tcp 127.0.0.1:3000 -&gt; a2a</span></span>
+<span><span>ready</span></span>
+<span><span></span></span></code></pre></div><p>Next, on the remote Linux machine, perform the work of launching helloworld-server, which is an A2A sample server. The portal-server you started earlier is running in the foreground, so leave that session as is and perform the following work either by connecting with a new ssh session or by starting a new session with tmux, etc. (in the case of ssh, local port forwarding is not necessary).</p>
+<p>First, clone the a2a-rs repository.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> git</span><span style="color:#9ECBFF"> clone</span><span style="color:#9ECBFF"> https://github.com/a2aproject/a2a-rs.git</span></span>
+<span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cd</span><span style="color:#9ECBFF"> a2a-rs</span></span>
+<span></span></code></pre></div><p>Next, modify helloworld-server.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> vi</span><span style="color:#9ECBFF"> examples/src/helloworld/server.rs</span></span>
+<span></span></code></pre></div><p>The modifications are as follows.</p>
+<div class="code-block-container"><pre><code><span class="line diff remove"><span class="diff-prefix">-</span><span>-- a/examples/src/helloworld/server.rs</span></span>
+<span class="line diff add"><span class="diff-prefix">+</span><span>++ b/examples/src/helloworld/server.rs</span></span>
+<span><span>@@ -53,8 +53,8 @@ async fn main() {</span></span>
+<span><span class="diff-prefix"> </span><span>    tracing::info!("REST:        http://localhost:3000/rest");</span></span>
+<span><span class="diff-prefix"> </span><span>    tracing::info!("gRPC:        http://localhost:50051");</span></span>
+<span><span></span></span>
+<span class="line diff remove"><span class="diff-prefix">-</span><span>    let http_listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();</span></span>
+<span class="line diff remove"><span class="diff-prefix">-</span><span>    let grpc_listener = tokio::net::TcpListener::bind("0.0.0.0:50051")</span></span>
+<span class="line diff add"><span class="diff-prefix">+</span><span>    let http_listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();</span></span>
+<span class="line diff add"><span class="diff-prefix">+</span><span>    let grpc_listener = tokio::net::TcpListener::bind("127.0.0.1:50051")</span></span>
+<span><span class="diff-prefix"> </span><span>        .await</span></span>
+<span><span class="diff-prefix"> </span><span>        .unwrap();</span></span>
+<span><span></span></span></code></pre></div><p>This modification is made because, by default, the helloworld-server service may be exposed to the internet. helloworld-server is written to listen on the address 0.0.0.0. To prevent this, we rewrite the listening address to 127.0.0.1.</p>
+<p>After rewriting, run cargo run as follows.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cargo</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> examples</span><span style="color:#79B8FF"> --bin</span><span style="color:#9ECBFF"> helloworld-server</span></span>
+<span></span></code></pre></div><p>Then, in a separate session, verify that it is only listening on localhost.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> ss</span><span style="color:#79B8FF"> -tlnp</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> grep</span><span style="color:#9ECBFF"> "hello"</span></span>
+<span></span></code></pre></div><p>If the listening address is 127.0.0.1 as shown below, it is successful.</p>
+<div class="code-block-container"><pre><code><span><span>LISTEN 0      128                      127.0.0.1:3000       0.0.0.0:*    users:(("helloworld-serv",pid=1732081,fd=9))                </span></span>
+<span><span>LISTEN 0      128                      127.0.0.1:50051      0.0.0.0:*    users:(("helloworld-serv",pid=1732081,fd=10))</span></span>
+<span><span></span></span></code></pre></div><p>Finally, start a2acli on the local Windows machine. By default, a2acli connects to TCP port 3000 on localhost via HTTP, so it connects to the portal-client started earlier and is forwarded to helloworld-server on the remote Linux machine.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> git clone https:</span><span style="color:#F97583">//</span><span style="color:#79B8FF">github.com</span><span style="color:#F97583">/</span><span style="color:#E1E4E8">a2aproject</span><span style="color:#F97583">/</span><span style="color:#E1E4E8">a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs.git</span></span>
+<span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> cd a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs</span></span>
+<span><span style="color:#E1E4E8">PS C:\Users\foo\a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> cargo run </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">bin a2acli </span><span style="color:#F97583">--</span><span style="color:#E1E4E8"> card get</span></span>
+<span></span></code></pre></div><p>If the connection succeeds, a string like the following is output.</p>
+<div class="code-block-container"><pre><code><span><span>Name: Hello World Agent</span></span>
+<span><span>Description: A simple echo agent that returns the input message.</span></span>
+<span><span>Version: 1.0</span></span>
+<span><span>Streaming: true</span></span>
+<span><span>Push Notifications: false</span></span>
+<span><span>Extended Card: false</span></span>
+<span><span>Interfaces:</span></span>
+<span><span>  - JSONRPC http://localhost:3000/jsonrpc (v1.0)</span></span>
+<span><span>  - HTTP+JSON http://localhost:3000/rest (v1.0)</span></span>
+<span><span>  - GRPC localhost:50051 (v1.0)</span></span>
+<span><span></span></span>
+<span><span>Skills: 1</span></span>
+<span><span></span></span></code></pre></div><p>Let's also try running a task. Run it as follows.</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo\a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> cargo run </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">bin a2acli </span><span style="color:#F97583">--</span><span style="color:#E1E4E8"> send </span><span style="color:#9ECBFF">"hello from rust"</span></span>
+<span></span></code></pre></div><p>If a string like the following is output, it is successful.</p>
+<div class="code-block-container"><pre><code><span><span>Task ID: 01a119a8-885d-76dc-abde-1dea996fc2e4</span></span>
+<span><span>Context ID: 01a119a8-885d-76dc-abde-1debf9b5c586</span></span>
+<span><span>State: COMPLETED</span></span>
+<span><span>Text:</span></span>
+<span><span>Echo: hello from rust</span></span>
+<span><span></span></span></code></pre></div><p>In this way, we were able to communicate via A2A through ISEKAI portal. Note that GRPC is not forwarded, so it cannot be used in this example.</p>
+<h2 id="a2a-en-12">
+ Summary</h2>
+<p>In this article, I introduced an example of connecting from a2acli on Windows to helloworld-server on Linux via A2A through ISEKAI portal.</p>
+<p>What I would like you to pay attention to here is that no configuration for accepting external connections is performed at all on the Linux side running helloworld-server. portal-server only connects outbound to ISEKAI link. Therefore, there is no need to change firewall or router settings, and the agent is never directly exposed to the internet.</p>
+<p>Also, who can connect is managed by Grants. This time, only the Endpoint of portal-client was specified as the connection partner, and an expiration period was also set. For parties without an issued Grant, portal-server does not reveal what Listeners are open, so they cannot even know that the service exists. Moreover, even for parties with an issued Grant, once the period expires, they can no longer connect.</p>
+<p>Applying this to the example at the beginning, the tax accountant firm can let only the client company's accounting agent use the tax check agent for the necessary period, without making it publicly available. A2A provides a common language for connecting agents to each other, but "which parties to open to and to what extent" needs to be considered separately. ISEKAI portal can take on that role.</p>
+<p>This time it was a minimal example of retrieving the Agent Card and exchanging messages, but any service that runs on TCP or UDP can be forwarded using the same procedure. Please try it with your own agents and services as well.</p>
+
+        </article>
+        <article class="prose" lang="ja">
+<p>A2A (Agent2Agent) はAIエージェント同士が連携するためのプロトコルです。A2A を使うことで、異なるベンダーや異なるフレームワークで作られたAIエージェント同士でやり取りをすることが可能になります。やり取りの例としては、社内の「経理エージェント」（クライアント）が、外部の税理士事務所が運営する「税務チェックエージェント」（リモート）に、月次仕訳のチェックを依頼する、というようなものが考えられます。</p>
+<p>この例において、外部の税理士事務所は、税務チェックエージェントをインターネット上に一般公開はしたくないと考えたとしましょう。そのようなニーズに応えるため、セーラ・ネットワークス株式会社では <a href="#portal" data-nav="portal">ISEKAI portal</a> を開発・公開しています。ISEKAI portal は、<a href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">過去の記事</a>で仕組みを紹介した ISEKAI link の上で動くアプリケーションです。この記事では、その実証として、Rust で書かれた A2A の実装である <a href="https://github.com/a2aproject/a2a-rs" target="_blank" rel="noopener">a2a-rs</a> に含まれる helloworld-server に ISEKAI portal を経由して、a2a-rs に含まれる a2acli を使って繋ぐ例を紹介してみようと思います。<br>
+<img src="assets/blog-c30c84fba882-20261007.gif" alt="portal 経由で a2acli から接続する様子" loading="lazy"></p>
+<p>なお、この記事の中で Endpoint や Grant などの ISEKAI link の用語が登場します。Endpoint は鍵で識別される端点、Grant は特定の Endpoint に Listener への接続を許可する期限付きの許可です。Listener は portal-server などが接続を待ち受ける窓口です。詳しくは、<a href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">過去の記事</a>を参照してください。</p>
+<p>また、a2a-rs を使用するので、ローカルの Windows、リモートの Linux 共に Rust ツールチェーンと git が必要です。Windows では、MSVC のビルドツール（Visual Studio Build Tools）も必要です。</p>
+<h2 id="a2a-ja-1">
+ ISEKAI portal のインストール</h2>
+<p>ISEKAI portal は MITライセンスでソースコードを公開しているので、<a href="https://github.com/seera-networks/ISEKAI-link/" target="_blank" rel="noopener">レポジトリ</a> を clone して、ビルドすることもできます。しかし、<a href="https://github.com/seera-networks/ISEKAI-link/blob/main/docs/Build.md" target="_blank" rel="noopener">ビルドの作業</a> は少し手間なので、ビルド済のバイナリを <a href="https://github.com/seera-networks/ISEKAI-link/releases" target="_blank" rel="noopener">Releases</a> からダウンロードするのが便利です。バイナリは現在</p>
+<ul>
+<li>Windows (amd64)</li>
+<li>Linux (Ubuntu, amd64)</li>
+<li>Mac (arm64)</li>
+</ul>
+<p>の3種類を用意しています。バイナリはいずれも zip 形式になっており、展開するとファイル名と同じ名前のディレクトリができるので（Windowsだと、portal-windows-latest）、そこにパスを通します。これでターミナル上から実行する準備ができました。</p>
+<h2 id="a2a-ja-2">
+ ISEKAI portal のセットアップ</h2>
+<p>インストールができたら、セットアップを行います。なお、以下ではサーバーを Linux 上で、クライアントを Windows 上で動かすという前提で説明します。</p>
+<h3 id="a2a-ja-3">
+ portal-server のセットアップ</h3>
+<h4 id="a2a-ja-4">
+ セットアップのための準備</h4>
+<p>サーバーを動かす Linux にリモートアクセスしている場合、次のように ssh を使って TCP の 38700 ポートをローカルに転送するようにします。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> ssh </span><span style="color:#F97583">-</span><span style="color:#E1E4E8">L </span><span style="color:#79B8FF">38700</span><span style="color:#E1E4E8">:</span><span style="color:#79B8FF">127.0</span><span style="color:#E1E4E8">.</span><span style="color:#79B8FF">0.1</span><span style="color:#E1E4E8">:</span><span style="color:#79B8FF">38700</span><span style="color:#E1E4E8"> foo@bar.example.com</span></span>
+<span></span></code></pre></div><p>後述するようにログインを Webブラウザ で行う必要があり、ログイン後に Webブラウザ が portal-server が開いているTCP の 38700 ポートに接続するようになっているのですが、リモートアクセスしている場合には、TCP の 38700 ポートが開いているのはリモートの Linux であり、これをローカルの環境に転送してあげる必要があるわけです。この処理は Linux をローカルで操作している場合は必要ありません。</p>
+<p>また、ISEKAI portal が利用する設定ファイルを保存するディレクトリを作っておきます。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> mkdir</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal</span></span>
+<span></span></code></pre></div><h4 id="a2a-ja-5">
+ プライバシーポリシーへの同意</h4>
+<p>ISEKAI linkを利用するにはサインアップが必要になりますが、その際に収集する個人情報の扱い方を定めたプライバシーポリシーに同意をいただくことにしています。portal-server を起動するとプライバシーポリシーが表示されますので、確認の上、以下のコマンドを実行して同意してください。同意がなされるまで、portal-server はプライバシーポリシーを表示して終了します。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> portal-server</span><span style="color:#79B8FF"> --accept-privacy-policy</span></span>
+<span></span></code></pre></div><p>なお、プライバシーポリシーは Web上でも公開しています（<a href="https://github.com/seera-networks/ISEKAI-link/blob/main/docs/privacy-policy.ja.md" target="_blank" rel="noopener">日本語版</a>および<a href="https://github.com/seera-networks/ISEKAI-link/blob/main/docs/privacy-policy.en.md" target="_blank" rel="noopener">英語版</a>）。</p>
+<h4 id="a2a-ja-6">
+ ログイン</h4>
+<p>ISEKAI link では Auth0 を用いてアカウント管理を行っています。利用のためにはログインが必要です。ログインするためには次のコマンドを実行します（--keyオプションは Endpoint の秘密鍵のファイルを指定するものですが、ログイン情報を保存するファイルが同じディレクトリに作られるのでここでも指定しています）。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> portal-server</span><span style="color:#79B8FF"> --key</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal/portal-server.pem</span><span style="color:#79B8FF"> --login</span></span>
+<span></span></code></pre></div><p>起動するとURLが表示されるので、Webブラウザ でアクセスしてください。アクセスすると"Enter Your Organization"と表示された画面がでますので、"Continue with personal account"をクリックします。すると、"Welcome"と表示されたログイン画面がでるので、アカウントが既にある場合はログインしてください。アカウントがない場合は"Sign up"をクリックしてアカウント作成画面に移ります。アカウントはメールアドレスとパスワードで作成できますが、Googleのアカウントやgithubのアカウントで作成することもできます。</p>
+<h4 id="a2a-ja-7">
+ 設定ファイルの作成</h4>
+<p>ISEKAI portal では接続先の情報をサービスの名前で指定します。その設定を行うのが portal-server の設定ファイルです。ここでは、~/.config/ISEKAI-portal/portal-server.toml という名前で次のような内容で保存します。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">[</span><span style="color:#B392F0">service</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">a2a</span><span style="color:#E1E4E8">]</span></span>
+<span><span style="color:#E1E4E8">protocol = </span><span style="color:#9ECBFF">"tcp"</span></span>
+<span><span style="color:#E1E4E8">target   = </span><span style="color:#9ECBFF">"127.0.0.1:3000"</span></span>
+<span></span></code></pre></div><h4 id="a2a-ja-8">
+ portal-server の起動</h4>
+<p>起動の準備ができたので、portal-server を次のように実行します。--key は秘密鍵のパスを指定するもので、ファイルがない場合、秘密鍵を生成します。ファイルがある場合はそこから秘密鍵を読み取ります。--registerは Endpoint がまだ登録されていない場合にはつける必要があります。初回起動時は秘密鍵を生成して新しい Endpoint を作っていますので、--register が必要です。2回目以降はつけないようにします（つけるとエラーになります）。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> portal-server</span><span style="color:#79B8FF"> --key</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal/portal-server.pem</span><span style="color:#79B8FF"> --config</span><span style="color:#9ECBFF"> ~/.config/ISEKAI-portal/portal-server.toml</span><span style="color:#79B8FF"> --register</span></span>
+<span></span></code></pre></div><h3 id="a2a-ja-9">
+ portal-client のセットアップ</h3>
+<p>portal-client のセットアップは portal-server とほとんど同じです。まず、設定ファイルを保存するディレクトリ（フォルダ）を作成します。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> mkdir </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal</span></span>
+<span></span></code></pre></div><p>次にプライバシーポリシーに同意しつつ、ログインを行います。なお、ログインを別のアカウントで行いたい場合など、2回目以降では、--accept-privacy-policyは必要ありません。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">key </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal\portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client.pem </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">login </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">accept</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">privacy</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">policy</span></span>
+<span></span></code></pre></div><p>先ほどと同様に出力された URL を Webブラウザ に入力してログインします（組織の選択では、"Continue with personal account"をクリックしてください）。ここでは、ログインするアカウントに先ほど作成したものを使います（異なるユーザーの Endpoint からでも接続を受け付けるように設定できるので、新しく別のアカウントを作っても問題はありません）。</p>
+<p>最後に Endpoint ID を調べます。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">key </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal\portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client.pem </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">whoami</span></span>
+<span></span></code></pre></div><p>"ep:"から続く文字列が出力されますが、これが Endpoint ID です。Grantを作成する際に必要になるので、メモしておきます。</p>
+<h3 id="a2a-ja-10">
+ Grant の発行</h3>
+<p>Grant を発行する方法はいろいろありますが、ここではダッシュボードから手動で発行する方法を紹介します。この方法は接続先の portal-server が起動した状態であれば使うことができます。</p>
+<p>まず、Webブラウザ で <a href="https://dashboard.isekai.tools/" target="_blank" rel="noopener">ISEKAI link ダッシュボード</a> にアクセスします。ログインが必要なので、portal-server でログインしているアカウントの情報を入力してください（繰り返しになりますが、組織の選択では、"Continue with personal account"をクリックしてください）。</p>
+<p>ログインすると一番上にメニューがあるので、"Grant"をクリックします（英語版の場合は"Grants"）。Grantの画面に移るので、"Grantを作る"のフォーム（英語版の場合は"Create a grant"）を埋めます。Listenerは portal-server のセットアップで起動した際に出ているものが一覧にあるはずなので、それを選びます。"入れる相手の Endpoint"のテキスト入力（英語版の場合は"Endpoint to let in"）に先ほどメモしておいた portal-client の Endpoint ID を入力します。"寿命"（英語版では"Lifetime"）は作成する Grant の有効期限です。1時間、8時間、24時間の中から選びます。"ラベル"のテキスト入力（英語版の場合は"Label"）は自分で管理するためのメモを入力できます。ここでは"a2a"と入力しておきましょう。入力を終えたら、"Grant を作る"のボタンをクリックします（"Create grant"）。</p>
+<p>これでセットアップは完了です。</p>
+<h2 id="a2a-ja-11">
+ 実際に接続してみる</h2>
+<p>まず、ローカルの Windows で portal-client を起動して、リモートの Linux の portal-server に接続します。--registerは初回起動時のみ必要です（2回目以降につけるとエラーになります）。--mapの引数の意味は、ローカルホストの TCP 3000 ポートで接続を受け付け、その接続を portal-server が指定する a2a の宛先に転送するという意味です。portal-client のリスニングを TCP 3000 ポートにしているのは、a2acli のデフォルトの接続先が TCP 3000 ポートになっているからです。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">key </span><span style="color:#79B8FF">$HOME</span><span style="color:#E1E4E8">\.config\ISEKAI</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">portal\portal</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">client.pem </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">map </span><span style="color:#79B8FF">3000</span><span style="color:#E1E4E8">:a2a </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">register</span></span>
+<span></span></code></pre></div><p>起動した後、次の文字列が出力されれば成功です。</p>
+<div class="code-block-container"><pre><code><span><span>tcp 127.0.0.1:3000 -&gt; a2a</span></span>
+<span><span>ready</span></span>
+<span><span></span></span></code></pre></div><p>次にリモートの Linux で、A2Aのサンプルサーバーである helloworld-server を立ち上げる作業を行います。先ほど立ち上げた portal-server はフォアグラウンドで動いていますので、そのセッションはそのままにして、以下の作業は新しく ssh で接続して行うか、tmux などで新しくセッションを立ち上げて行ってください（ssh の場合、ローカルポートのフォワードは必要ありません）。</p>
+<p>最初に a2a-rs のレポジトリを clone します。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> git</span><span style="color:#9ECBFF"> clone</span><span style="color:#9ECBFF"> https://github.com/a2aproject/a2a-rs.git</span></span>
+<span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cd</span><span style="color:#9ECBFF"> a2a-rs</span></span>
+<span></span></code></pre></div><p>次に、helloworld-server の修正を行います。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> vi</span><span style="color:#9ECBFF"> examples/src/helloworld/server.rs</span></span>
+<span></span></code></pre></div><p>修正内容は次の通りです。</p>
+<div class="code-block-container"><pre><code><span class="line diff remove"><span class="diff-prefix">-</span><span>-- a/examples/src/helloworld/server.rs</span></span>
+<span class="line diff add"><span class="diff-prefix">+</span><span>++ b/examples/src/helloworld/server.rs</span></span>
+<span><span>@@ -53,8 +53,8 @@ async fn main() {</span></span>
+<span><span class="diff-prefix"> </span><span>    tracing::info!("REST:        http://localhost:3000/rest");</span></span>
+<span><span class="diff-prefix"> </span><span>    tracing::info!("gRPC:        http://localhost:50051");</span></span>
+<span><span></span></span>
+<span class="line diff remove"><span class="diff-prefix">-</span><span>    let http_listener = tokio::net::TcpListener::bind("0.0.0.0:3000").await.unwrap();</span></span>
+<span class="line diff remove"><span class="diff-prefix">-</span><span>    let grpc_listener = tokio::net::TcpListener::bind("0.0.0.0:50051")</span></span>
+<span class="line diff add"><span class="diff-prefix">+</span><span>    let http_listener = tokio::net::TcpListener::bind("127.0.0.1:3000").await.unwrap();</span></span>
+<span class="line diff add"><span class="diff-prefix">+</span><span>    let grpc_listener = tokio::net::TcpListener::bind("127.0.0.1:50051")</span></span>
+<span><span class="diff-prefix"> </span><span>        .await</span></span>
+<span><span class="diff-prefix"> </span><span>        .unwrap();</span></span>
+<span><span></span></span></code></pre></div><p>この修正を行うのは、デフォルトでは、helloworld-server のサービスがインターネットに公開されてしまう可能性があるからです。helloworld-server はアドレス 0.0.0.0 を使ってリスニングするように書かれています。これを防ぐため、リスニングするアドレスを 127.0.0.1 に書き換えるわけです。</p>
+<p>書き換え後、次のように cargo run を実行します。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> cargo</span><span style="color:#9ECBFF"> run</span><span style="color:#79B8FF"> -p</span><span style="color:#9ECBFF"> examples</span><span style="color:#79B8FF"> --bin</span><span style="color:#9ECBFF"> helloworld-server</span></span>
+<span></span></code></pre></div><p>その後、別のセッションでローカルホストでしかリスニングしていないことを確かめます。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#B392F0">$</span><span style="color:#9ECBFF"> ss</span><span style="color:#79B8FF"> -tlnp</span><span style="color:#F97583"> |</span><span style="color:#B392F0"> grep</span><span style="color:#9ECBFF"> "hello"</span></span>
+<span></span></code></pre></div><p>次のようにリスニングしているアドレスが 127.0.0.1 になっていれば成功です。</p>
+<div class="code-block-container"><pre><code><span><span>LISTEN 0      128                      127.0.0.1:3000       0.0.0.0:*    users:(("helloworld-serv",pid=1732081,fd=9))                </span></span>
+<span><span>LISTEN 0      128                      127.0.0.1:50051      0.0.0.0:*    users:(("helloworld-serv",pid=1732081,fd=10))</span></span>
+<span><span></span></span></code></pre></div><p>最後にローカルの Windows で、a2acli を起動します。a2acli はデフォルトでは localhost の TCP 3000 ポートに HTTP で接続するようになっているので、先ほど立ち上げた portal-client に接続し、リモートの Linux の helloworld-server へと転送されることになります。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> git clone https:</span><span style="color:#F97583">//</span><span style="color:#79B8FF">github.com</span><span style="color:#F97583">/</span><span style="color:#E1E4E8">a2aproject</span><span style="color:#F97583">/</span><span style="color:#E1E4E8">a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs.git</span></span>
+<span><span style="color:#E1E4E8">PS C:\Users\foo</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> cd a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs</span></span>
+<span><span style="color:#E1E4E8">PS C:\Users\foo\a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> cargo run </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">bin a2acli </span><span style="color:#F97583">--</span><span style="color:#E1E4E8"> card get</span></span>
+<span></span></code></pre></div><p>接続に成功すると次のような文字列が出力されます。</p>
+<div class="code-block-container"><pre><code><span><span>Name: Hello World Agent</span></span>
+<span><span>Description: A simple echo agent that returns the input message.</span></span>
+<span><span>Version: 1.0</span></span>
+<span><span>Streaming: true</span></span>
+<span><span>Push Notifications: false</span></span>
+<span><span>Extended Card: false</span></span>
+<span><span>Interfaces:</span></span>
+<span><span>  - JSONRPC http://localhost:3000/jsonrpc (v1.0)</span></span>
+<span><span>  - HTTP+JSON http://localhost:3000/rest (v1.0)</span></span>
+<span><span>  - GRPC localhost:50051 (v1.0)</span></span>
+<span><span></span></span>
+<span><span>Skills: 1</span></span>
+<span><span></span></span></code></pre></div><p>タスクも実行してみます。次のように実行します。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">PS C:\Users\foo\a2a</span><span style="color:#F97583">-</span><span style="color:#E1E4E8">rs</span><span style="color:#F97583">&gt;</span><span style="color:#E1E4E8"> cargo run </span><span style="color:#F97583">--</span><span style="color:#E1E4E8">bin a2acli </span><span style="color:#F97583">--</span><span style="color:#E1E4E8"> send </span><span style="color:#9ECBFF">"hello from rust"</span></span>
+<span></span></code></pre></div><p>次のような文字列が出力されれば成功です。</p>
+<div class="code-block-container"><pre><code><span><span>Task ID: 01a119a8-885d-76dc-abde-1dea996fc2e4</span></span>
+<span><span>Context ID: 01a119a8-885d-76dc-abde-1debf9b5c586</span></span>
+<span><span>State: COMPLETED</span></span>
+<span><span>Text:</span></span>
+<span><span>Echo: hello from rust</span></span>
+<span><span></span></span></code></pre></div><p>このようにして ISEKAI portal を経由して A2A でやり取りすることができました。なお、GRPCについては転送するようにしていないので、今回は使えないことに注意してください。</p>
+<h2 id="a2a-ja-12">
+ まとめ</h2>
+<p>この記事では、ISEKAI portal を経由して、Linux 上の helloworld-server に Windows 上の a2acli から A2A で接続する例を紹介しました。</p>
+<p>ここで注目していただきたいのは、helloworld-server を動かしている Linux 側で、外部からの接続を受け付けるための設定を一切行っていないことです。portal-server は ISEKAI link に自分から接続しに行くだけです。そのため、ファイアウォールやルーターの設定を変える必要はなく、エージェントがインターネットに直接さらされることもありません。</p>
+<p>また、誰が接続できるかは Grant で管理されます。今回は portal-client の Endpoint だけを接続相手として指定し、有効期限も付けました。Grant を発行していない相手には、portal-server がどのような Listener を開いているかが見えないので、サービスがあることすら分かりません。また、Grant を発行した相手であっても、期限が切れれば接続できなくなります。</p>
+<p>冒頭の例に当てはめると、税理士事務所は税務チェックエージェントを一般公開しないまま、顧客企業の経理エージェントにだけ、必要な期間だけ使わせることができます。A2A はエージェント同士をつなぐ共通の言葉を提供しますが、「どの相手にどこまで開くか」は別に考える必要があります。ISEKAI portal は、その部分を担うことができます。</p>
+<p>今回は Agent Card の取得とメッセージのやり取りという最小限の例でしたが、TCP や UDP で動くサービスであれば同じ手順で転送できます。ぜひ手元のエージェントやサービスでも試してみてください。</p>
+
+        </article>
+        <p class="post-source"><a lang="en" href="https://zenn.dev/seera/articles/9bb592ca7b575a?locale=en" target="_blank" rel="noopener">Also published on Zenn</a><a lang="ja" href="https://zenn.dev/seera/articles/9bb592ca7b575a" target="_blank" rel="noopener">Zennでも公開しています</a></p>
+      </div>
+    </div>
+  </section>
+  <section data-page="post-8e4d8a0ce44aae" hidden>
+    <div class="wrap page-header post-header">
+      <button class="back-link" data-nav="blog"><span lang="en">← All posts</span><span lang="ja">← 記事一覧</span></button>
+      <h1><span lang="en">Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</span><span lang="ja">MASQUE越しにLLMチャットを流す：ISEKAI Portal クライアント</span></h1>
+      <p class="post-meta"><time datetime="2026-09-27">2026-09-27</time></p>
+    </div>
+    <div class="section post-body">
+      <div class="wrap">
+        <article class="prose" lang="en">
 <h2>
  Tunneling LLM Chat Over MASQUE: the ISEKAI Portal Client</h2>
 <p><a href="https://github.com/seera-networks/ISEKAI-link" target="_blank" rel="noopener">ISEKAI link</a> is Seera Networks' service for connecting devices on different networks over QUIC: it handles authentication and connection brokering, and relays traffic for peers that can't reach each other directly. The relay speaks MASQUE, the IETF's family of HTTP/3-based proxying protocols (here CONNECT-UDP, RFC 9298), so a peer's own QUIC connection travels tunneled inside the relay's. Its first application was a live-video camera pair, covered in the <a href="#post-3ff5f4507c6f69" data-nav="post-3ff5f4507c6f69">previous article</a>.</p>
@@ -874,6 +1156,7 @@
 <h2>
  Model Choice Is Just a Config String</h2>
 <p>The model running this time is <code>qwen3.5:4b</code> — chosen because it fits comfortably in this Jetson Orin Nano's unified memory (shared by its CPU and GPU) alongside everything else sharing the box, not because anything upstream of Ollama cares which model it is. Neither <code>portal-core</code>'s forwarding nor the client's HTTP layer look at the model name beyond passing it through in the <code>/api/chat</code> request body. Any open-weights model works as a drop-in replacement, as long as it fits the on-premise GPU/NPU hardware it's meant to run on — the tradeoff is entirely local (memory budget, cold-load time, tokens/sec), not architectural.</p>
+<p>The same goes for the server itself: Ollama isn't special here. The catalogue can point at <a href="https://lemonade-server.ai/" target="_blank" rel="noopener">Lemonade Server</a>: an open-source server that runs AI models — LLM chat as well as image generation, speech and embeddings — locally on your own PC and serves them through the standard OpenAI-compatible API, on Windows, macOS and Linux. Adding a <code>[service.lemonade]</code> entry that targets its port on <code>127.0.0.1</code> is all it takes; the app then sends <code>/api/v1/chat/completions</code> requests instead of <code>/api/chat</code>, and the relay, pairing and forwarding stay exactly the same.</p>
 <h2>
  Multi-Turn Memory Is Resent, Not Stored</h2>
 <p>Ollama keeps no state between requests on either <code>/api/generate</code> or <code>/api/chat</code> — a client has to resend everything it wants remembered. The first version of this app didn't: every request went to <code>/api/generate</code> with only the current turn's text, so each reply was effectively the first message the model had ever seen.</p>
@@ -894,7 +1177,57 @@
 <p>The interesting result isn't the chat UI — it's that swapping "stream video frames" for "tunnel a stateless HTTP API" left the relay, the pairing model and the certificates untouched. Everything new sat on top of them: an inner ALPN, <code>portal-core</code>'s forwarding protocol, and a one-entry catalogue. On the client, the only transport-adjacent decisions were streaming the reply and a per-read timeout long enough to survive a cold model load. That's the bet the generic service-catalogue design was making, and it held.</p>
 
         </article>
-        <p class="post-source"><a lang="en" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae?locale=en" target="_blank" rel="noopener">Also published on Zenn</a><a lang="ja" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae" target="_blank" rel="noopener">Zennでも公開しています</a></p>
+        <article class="prose" lang="ja">
+<h2>
+ MASQUE越しにLLMチャットを流す：ISEKAI Portal クライアント</h2>
+<p><a href="https://github.com/seera-networks/ISEKAI-link" target="_blank" rel="noopener">ISEKAI link</a> は、異なるネットワーク上のデバイス同士を QUIC で接続するセーラ・ネットワークスのサービスです。認証と接続の仲介を行い、互いに直接到達できないピア同士の通信はリレーします。リレーは、IETF が標準化している HTTP/3 ベースのプロキシプロトコル群である MASQUE（ここでは CONNECT-UDP、RFC 9298）を話すため、ピア自身の QUIC 接続はリレーの QUIC 接続の中をトンネルされて流れます。最初のアプリケーションはライブ映像のカメラアプリの組で、<a href="#post-3ff5f4507c6f69" data-nav="post-3ff5f4507c6f69">前回の記事</a>で紹介しました。</p>
+<p>ISEKAI Portal クライアントはその2つ目のアプリで、一方向の映像ストリームではなく、リクエスト／レスポンス型の通信を運びます。リモートのマシン上でローカルに動いている <a href="https://ollama.com" target="_blank" rel="noopener">Ollama</a> に、同じリレー基盤を通して HTTP リクエストを転送する、小さな Android チャットアプリです。カメラアプリと同じ転送プロトコルとセッション／リレーの仕組みを持つ <code>portal-core</code> と <code>isekai-p2p</code> の上に作られており、ISEKAI link の汎用的な側面を実証しています。映像専用の経路をハードコードする代わりに、運用者がカタログに名前付きのサービスを宣言すれば、ペアリング済みのピアはそれをローカルにあるかのように利用できます。</p>
+<div class="embed"><pre class="mermaid">flowchart LR
+  A[&quot;Android アプリ&lt;br/&gt;(チャット UI)&quot;] -- &quot;127.0.0.1 への HTTP&quot; --&gt; F[&quot;portal-client-ffi&lt;br/&gt;(ローカル転送)&quot;]
+  F -- &quot;内側の QUIC&lt;br/&gt;ALPN isekai-portal-v1&quot; --&gt; R[&quot;ISEKAI link リレー&lt;br/&gt;(MASQUE CONNECT-UDP)&quot;]
+  R --&gt; S[&quot;portal-server&lt;br/&gt;(Jetson)&quot;]
+  F -. &quot;直接経路（検証できた場合）&quot; .-&gt; S
+  S -- &quot;TCP&quot; --&gt; O[&quot;Ollama&lt;br/&gt;127.0.0.1:11434&quot;]</pre></div><p>すべてのセッションはまずリレー経由で始まり、直接経路が検証できた時点でそちらに移ります。下のデモでは、スマートフォンは最初 Jetson と同じ Wi-Fi ネットワーク上にあり、5G に切り替わった後に再接続したセッションはリレー経由のままです。</p>
+<p><img src="assets/blog-3cd82d93247e-20260926.gif" alt="" loading="lazy"></p>
+<p><em>Android スマートフォンが Jetson とペアリングし、Wi-Fi 経由で2つ質問した後、セッションの途中で 5G に切り替えます。アプリはリレー経由で再接続し、続けて送った質問にはチャット履歴を踏まえた答えが返ってきます。</em></p>
+<h2>
+ リレーはそのまま、ストリームの形を変える</h2>
+<p><code>portal-core</code> の転送モデルは意図的に汎用的に作られています。TCP 接続1本につき双方向の QUIC ストリームを1本、UDP にはセッション ID をキーにしたデータグラムを使います。これは、フレームごとに単方向ストリームを1本使う <code>camera-client</code> の設計とは異なる形です。ここには「古いフレームを捨てる」ロジックはありません。チャットのリクエストはライブメディアではなく、たまたまトンネルされているだけの通常のリクエスト／レスポンス型の HTTP のやり取りだからです。その下にあるリレー、証明書、ペアリング（<code>isekai-p2p</code>）は、変更なしで両方に使えます。portal はカメラの P2P プロトコル文字列まで再利用しています。portal が追加したものはその上に乗っています。独自の内側の ALPN（<code>isekai-portal-v1</code>。映像も portal も話さないピアは、ストリームの途中ではなくハンドシェイクの時点で失敗します）、<code>portal-core</code> の転送プロトコル、そしてサービスカタログです。</p>
+<h2>
+ ポリシーはカタログがすべて</h2>
+<p>今回のビルドは NVIDIA <a href="https://www.nvidia.com/en-us/autonomous-machines/embedded-systems/jetson-orin/nano-super-developer-kit/" target="_blank" rel="noopener">Jetson Orin Nano</a> 上で動いています。机の上に置ける小さなエッジボードでありながら、ローカル LLM を動かせるだけの GPU を備えています。ただし、設計はこのボードに依存していません。Mac mini や AMD Ryzen AI Halo など、モデルを動かせるオンプレミスのマシンであれば同じように使えます。Jetson では <code>portal-server</code> が動いており、エントリが1つだけのサービスカタログを指定して起動しています。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">[</span><span style="color:#B392F0">service</span><span style="color:#E1E4E8">.</span><span style="color:#B392F0">ollama</span><span style="color:#E1E4E8">]</span></span>
+<span><span style="color:#E1E4E8">protocol = </span><span style="color:#9ECBFF">"tcp"</span></span>
+<span><span style="color:#E1E4E8">target = </span><span style="color:#9ECBFF">"127.0.0.1:11434"</span></span>
+<span></span></code></pre></div><p>クライアントはサービスを（アドレスではなく）<strong>名前で</strong>（"ollama"）要求します。そのため、ペアリング済みのピアが到達できるのはカタログが明示的に提供するものだけで、接続元が任意の接続先を指定することはできません。このカタログは、あえて <code>portal-server</code> のデフォルトの設定ファイルのパス／名前にはしていません。Ollama には独自の認証がないためです。<code>--config</code> を付け忘れた運用者のもとで黙ってカタログが読み込まれてしまうと、生のローカル LLM エンドポイントをペアリング済みのすべてのピアに渡すことになります。</p>
+<p>カタログが線を引くのはポートの単位であって、リクエストの単位ではありません。転送は単純なレイヤー4で、<code>portal-server</code> はトンネルと <code>127.0.0.1:11434</code> の間でバイト列を読まずにコピーします。そのため、ペアリング済みのピアは Ollama の API 全体を使えます。<code>/api/chat</code> だけでなく、<code>/api/pull</code>、<code>/api/delete</code>、<code>/api/create</code> もです。エンドポイント単位で制限するには Ollama の前に HTTP を解釈するプロキシが必要で、それはこのレイヤーの役割の外です。この設計が制御しているのは、誰が入れるかと、ポートがどこにあるかです。トンネルを開けるのは、運用者が発行したペアリングコード（有効期限は最大5分で、後から <code>portal-server --revoke</code> で取り消せます）を使ったピアだけで、Ollama は <code>127.0.0.1</code> にバインドされたままなので、LAN に公開されることはありません。</p>
+<h2>
+ 接続を保つためのストリーミング</h2>
+<p>最初に動いたバージョンでは Ollama の <code>stream: false</code> を使い、返答全体を待っていました。これは単に壊れているように見えただけではありません。トンネル越しに1分以上無通信が続くと、ストリーミングしない返答はそのまま失敗していました。<code>stream: true</code>（Ollama の改行区切り JSON によるストリーミング形式）に切り替えることで、全体のレイテンシーは変えずに問題が解決しました。変わったのは最初のトークンが届くまでの時間です。モデルが生成している間、実際のバイト列がトンネルを途切れなく流れるようになりました。これは、経路を無通信にせずリレーのキープアライブを流し続けるという<a href="#post-3ff5f4507c6f69" data-nav="post-3ff5f4507c6f69">カメラ製品</a>の判断と同じ原則です。アプリは今でも1回の読み取りに90秒を許容しています。モデルのコールドロードだけで Jetson では約40秒かかったため、それをカバーできる長さです。</p>
+<h2>
+ モデルの選択は設定文字列ひとつ</h2>
+<p>今回動かしているモデルは <code>qwen3.5:4b</code> です。これを選んだのは、この Jetson Orin Nano のユニファイドメモリ（CPU と GPU で共有）に、同じマシン上の他のすべてと一緒に無理なく収まるからであって、Ollama より上流の何かがモデルの種類を気にしているからではありません。<code>portal-core</code> の転送も、クライアントの HTTP レイヤーも、モデル名は <code>/api/chat</code> のリクエストボディでそのまま渡すだけで、中身を見ていません。想定するオンプレミスの GPU／NPU ハードウェアに収まりさえすれば、どのオープンウェイトモデルでもそのまま置き換えられます。トレードオフは完全にローカルなもの（メモリ予算、コールドロード時間、トークン/秒）であって、アーキテクチャ上のものではありません。</p>
+<p>サーバー自体についても同じことが言えます。ここで Ollama は特別な存在ではありません。カタログの接続先を <a href="https://lemonade-server.ai/" target="_blank" rel="noopener">Lemonade Server</a> にすることもできます。Lemonade Server は、LLM によるチャットに加えて画像生成・音声・埋め込みなどの AI モデルを自分の PC 上で動かし、標準的な OpenAI 互換 API で提供するオープンソースのサーバーで、Windows・macOS・Linux で動作します。必要なのは、<code>127.0.0.1</code> 上のそのポートを指す <code>[service.lemonade]</code> のエントリを追加することだけです。アプリは <code>/api/chat</code> の代わりに <code>/api/v1/chat/completions</code> にリクエストを送るようになり、リレー、ペアリング、転送はまったく変わりません。</p>
+<h2>
+ マルチターンの記憶は保存ではなく再送</h2>
+<p>Ollama は <code>/api/generate</code> でも <code>/api/chat</code> でもリクエスト間で状態を保持しません。覚えておいてほしいことは、クライアントがすべて再送する必要があります。このアプリの最初のバージョンはそうしていませんでした。すべてのリクエストを、そのターンのテキストだけを付けて <code>/api/generate</code> に送っていたため、どの返答も、事実上モデルが初めて見たメッセージへの返答になっていました。</p>
+<p>修正では、クライアントを <code>/api/chat</code> に切り替え、毎ターン会話全体を、新しい質問を最後にして再送するようにしました。</p>
+<div class="code-block-container"><pre><code><span><span style="color:#E1E4E8">{</span><span style="color:#79B8FF">"model"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"qwen3.5:4b"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"stream"</span><span style="color:#E1E4E8">: </span><span style="color:#79B8FF">true</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"messages"</span><span style="color:#E1E4E8">: [</span></span>
+<span><span style="color:#E1E4E8">  {</span><span style="color:#79B8FF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"user"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"whats your model"</span><span style="color:#E1E4E8">},</span></span>
+<span><span style="color:#E1E4E8">  {</span><span style="color:#79B8FF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"assistant"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"I am Qwen3.5."</span><span style="color:#E1E4E8">},</span></span>
+<span><span style="color:#E1E4E8">  {</span><span style="color:#79B8FF">"role"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"user"</span><span style="color:#E1E4E8">, </span><span style="color:#79B8FF">"content"</span><span style="color:#E1E4E8">: </span><span style="color:#9ECBFF">"what was the question I asked previously?"</span><span style="color:#E1E4E8">}</span></span>
+<span><span style="color:#E1E4E8">]}</span></span>
+<span></span></code></pre></div><p>ストリーミングされる各行のテキストは、<code>/api/generate</code> のフラットな <code>response</code> フィールドではなく、<code>message.content</code> に入って届きます。</p>
+<p>もっともらしい続きではなく、記憶していることを証明できる最も単純なテストで確認しました。1つ目のメッセージでモデルに「My favorite color is teal.」（好きな色はティール）と伝え、別のメッセージで「What is my favorite color?」（私の好きな色は？）と尋ねると、「Teal.」と返ってきました。</p>
+<p>ただし、トレードオフが残ります。アプリ自身は会話の切り詰めを一切行わないため、毎ターン会話全体が再送されます。モデルが実際にそのうちどれだけを見られるかは、Ollama 側のコンテキストウィンドウの設定（<code>num_ctx</code>）で上限が決まります。それを超えると Ollama は古いターンから黙って捨てるため、十分に長いチャットでは、いずれティールのテストに失敗します。<code>num_ctx</code> を上げればその時点を先に延ばせますが、値はローカルのハードウェアに合わせて決めるべきです。コンテキストウィンドウが大きいほど KV キャッシュも大きくなり、モデル自体と同じメモリを奪い合うからです。デモの範囲としてはこれで十分ですが、実運用では独自の切り詰めや要約の戦略が必要になるでしょう。</p>
+<h2>
+ 認証はそのまま流用</h2>
+<p>エンドポイント鍵と Auth0 のデバイスフローによるペアリングモデルは、<code>camera-client</code> とまったく同じです。初回起動時に新しい ECDSA 鍵を生成してアプリのプライベートストレージに保存し、Auth0 でサインインします。ペアリングの Grant はセッションではなく Endpoint ID に紐づくため、Jetson 上の <code>portal-server</code> を再起動しても、ペアリングし直す必要はありません。</p>
+<h2>
+ 設計思想</h2>
+<p>注目すべきはチャット UI ではありません。「映像フレームをストリーミングする」を「ステートレスな HTTP API をトンネルする」に置き換えても、リレー、ペアリングモデル、証明書には手を入れずに済んだことです。新しく加えたものはすべてその上に乗っています。内側の ALPN、<code>portal-core</code> の転送プロトコル、そしてエントリが1つのカタログです。クライアント側でトランスポートに関わる判断は、返答をストリーミングすることと、モデルのコールドロードを乗り切れるだけの長さの読み取りタイムアウトを設けることだけでした。汎用的なサービスカタログという設計はこの点を見込んだもので、実際にそのとおりになりました。</p>
+        </article>
+        <p class="post-source"><a lang="en" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae?locale=en" target="_blank" rel="noopener">Also published on Zenn</a><a lang="ja" href="https://zenn.dev/seera/articles/8e4d8a0ce44aae" target="_blank" rel="noopener">Zennでも公開しています（英語）</a></p>
       </div>
     </div>
   </section>
