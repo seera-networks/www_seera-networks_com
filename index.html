@@ -4,12 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>ISEKAI by Seera Networks | The connection layer for AI agents and devices</title>
-<meta name="description" content="Secure remote access to one service, not a whole network. ISEKAI Link, ISEKAI Camera and ISEKAI Compute by Seera Networks, Inc.">
+<meta name="description" content="Secure remote access to one service, not a whole network. ISEKAI Link, ISEKAI Camera and ISEKAI Compute by Seera Networks">
 <meta name="theme-color" content="#0F1A24">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="ISEKAI by Seera Networks">
 <meta property="og:title" content="ISEKAI by Seera Networks | The connection layer for AI agents and devices">
-<meta property="og:description" content="Secure remote access to one service, not a whole network. ISEKAI Link, ISEKAI Camera and ISEKAI Compute by Seera Networks, Inc.">
+<meta property="og:description" content="Secure remote access to one service, not a whole network. ISEKAI Link, ISEKAI Camera and ISEKAI Compute by Seera Networks">
 <meta name="twitter:card" content="summary">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -761,7 +761,7 @@
           <span class="kicker"><span lang="en">Company</span><span lang="ja">会社情報</span></span>
         </div>
         <dl class="facts grid g3" style="display:grid">
-          <div class="plain"><dt style="color:var(--muted);font-size:13px"><span lang="en">Company name</span><span lang="ja">社名</span></dt><dd style="margin:0">Seera Networks, Inc.<br>セーラ・ネットワークス株式会社<br><span lang="en">Founded August 2020</span><span lang="ja">設立：2020年8月</span></dd></div>
+          <div class="plain"><dt style="color:var(--muted);font-size:13px"><span lang="en">Company name</span><span lang="ja">社名</span></dt><dd style="margin:0">Seera Networks<br>セーラ・ネットワークス株式会社<br><span lang="en">Founded August 2020</span><span lang="ja">設立：2020年8月</span></dd></div>
           <div class="plain"><dt style="color:var(--muted);font-size:13px"><span lang="en">Address</span><span lang="ja">所在地</span></dt><dd style="margin:0"><span lang="en">6-23-4 Jingumae, Shibuya-ku, Tokyo, Japan</span><span lang="ja">東京都渋谷区神宮前6-23-4</span><br><span lang="en">Team also in San Francisco</span><span lang="ja">サンフランシスコにもメンバー在籍</span></dd></div>
           <div class="plain"><dt style="color:var(--muted);font-size:13px"><span lang="en">Business</span><span lang="ja">事業内容</span></dt><dd style="margin:0"><span lang="en">Secure connectivity for AI agents and devices, and secure data processing</span><span lang="ja">AIエージェントとデバイスのためのセキュアな接続サービス、セキュアなデータ処理基盤</span></dd></div>
         </dl>
@@ -852,7 +852,7 @@
       <div class="wrap">
         <article class="prose" lang="en">
 <p>A2A (Agent2Agent) is a protocol for AI agents to collaborate with each other. By using A2A, it becomes possible for AI agents built by different vendors or with different frameworks to communicate with each other. As an example of such communication, one could imagine a scenario where an internal "accounting agent" (client) requests a "tax check agent" (remote) operated by an external tax accountant firm to check monthly journal entries.</p>
-<p>In this example, let's say the external tax accountant firm does not want to expose the tax check agent publicly on the internet. To meet such needs, Seera Networks, Inc. has developed and released <a href="#portal" data-nav="portal">ISEKAI portal</a>. ISEKAI portal is an application that runs on top of ISEKAI link, whose mechanism was introduced in a <a href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">past article</a>. In this article, as a demonstration, I would like to introduce an example of connecting to helloworld-server included in <a href="https://github.com/a2aproject/a2a-rs" target="_blank" rel="noopener">a2a-rs</a>, which is an implementation of A2A written in Rust, via ISEKAI portal using a2acli, which is also included in a2a-rs.<br>
+<p>In this example, let's say the external tax accountant firm does not want to expose the tax check agent publicly on the internet. To meet such needs, Seera Networks has developed and released <a href="#portal" data-nav="portal">ISEKAI portal</a>. ISEKAI portal is an application that runs on top of ISEKAI link, whose mechanism was introduced in a <a href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">past article</a>. In this article, as a demonstration, I would like to introduce an example of connecting to helloworld-server included in <a href="https://github.com/a2aproject/a2a-rs" target="_blank" rel="noopener">a2a-rs</a>, which is an implementation of A2A written in Rust, via ISEKAI portal using a2acli, which is also included in a2a-rs.<br>
 <img src="assets/blog-c30c84fba882-20261007.gif" alt="Connecting from a2acli via portal" loading="lazy"></p>
 <p>Note that terms from ISEKAI link such as Endpoint and Grant appear in this article. An Endpoint is an endpoint identified by a key, and a Grant is a time-limited permission that allows a specific Endpoint to connect to a Listener. A Listener is a gateway through which portal-server, etc. waits for connections. For details, please refer to the <a href="#post-9fb02b24fc07c4" data-nav="post-9fb02b24fc07c4">past article</a>.</p>
 <p>Also, since we use a2a-rs, both the local Windows environment and the remote Linux environment need the Rust toolchain and git. On Windows, MSVC build tools (Visual Studio Build Tools) are also required.</p>
@@ -1241,7 +1241,7 @@
       <div class="wrap">
         <article class="prose" lang="en">
 <p>Suppose an engineer at a subcontractor says to you, "If I could just let Claude Code see the staging DB directly, the investigation would be over in an instant." If you issue a VPN, the entire internal network becomes visible, and if you hand over the DB password, you can't tell whether a human or an agent touched it, nor can you be sure it was properly shut off after the contract ended. What you want is a path that connects "only to this DB," "in a form that makes it clear it's agent access," and "only during the contract period." This article introduces how ISEKAI link achieves this.</p>
-<p>ISEKAI link is a relay service developed by Seera Networks, Inc. that connects devices on different networks via QUIC. ISEKAI link has a mode that, rather than inviting the other party into the network, draws a single path only between an authorized party and a specific resource. Applying this to the earlier example, it works as "drawing a path only between the staging DB and the subcontractor's Claude Code."</p>
+<p>ISEKAI link is a relay service developed by Seera Networks that connects devices on different networks via QUIC. ISEKAI link has a mode that, rather than inviting the other party into the network, draws a single path only between an authorized party and a specific resource. Applying this to the earlier example, it works as "drawing a path only between the staging DB and the subcontractor's Claude Code."</p>
 <p>The elements that make this behavior possible are the following three. The first is identity (Endpoint) that can be used differently depending on the purpose; by seeing which Endpoint an access comes from, human access and agent access can be distinguished and recorded. The second is permission (Grant) that determines who may connect to which resource, and once revoked, connection becomes impossible. The third is the connection mechanism that connects via a relay without opening ports, and switches to a direct path when possible. Below, after explaining these three, I will discuss how we made it possible to realize a path that connects "only to this DB," "in a form that makes it clear it's agent access," and "only during the contract period."</p>
 <h2>
  What is an Endpoint</h2>
@@ -1444,7 +1444,7 @@
     <div class="section post-body">
       <div class="wrap">
         <article class="prose" lang="en">
-<p>SEERA Networks Inc. maintains SEERA MsQuic as a fork of MsQuic, which Microsoft creates and publishes (for details, see <a href="#post-90c6a46e491351" data-nav="post-90c6a46e491351">the introduction article of SEERA MsQuic</a>). One feature that SEERA MsQuic has which upstream MsQuic does not is that the client side can initiate migration. In this article, we will discuss this feature.</p>
+<p>Seera Networks maintains SEERA MsQuic as a fork of MsQuic, which Microsoft creates and publishes (for details, see <a href="#post-90c6a46e491351" data-nav="post-90c6a46e491351">the introduction article of SEERA MsQuic</a>). One feature that SEERA MsQuic has which upstream MsQuic does not is that the client side can initiate migration. In this article, we will discuss this feature.</p>
 <p>Let's start by reviewing the migration content specified in RFC9000. Migration can occur after the connection establishment handshake is complete. Specifically, section 9.2 states that a QUIC endpoint can migrate to a new local address by sending packets containing non-probing frames (non-probing packets) from that new local address. A non-probing frame is any frame other than a probing frame, where probing frames are defined as PATH_CHALLENGE, PATH_RESPONSE, NEW_CONNECTION_ID, and PADDING. For example, a packet containing a STREAM frame qualifies as a non-probing packet. Then, section 9.3 states that an endpoint that receives a non-probing packet from a different peer address must subsequently send packets to that peer address. In short, QUIC switches the address used for communication through the transmission and reception of non-probing packets sourced from a new address.</p>
 <p>However, it would be problematic if simply receiving a non-probing packet sourced from a new address were sufficient. Since QUIC packet authentication only covers the UDP payload, the new address could be spoofed and not actually owned by the endpoint. This could enable attacks such as connection hijacking or sending packets to unrelated hosts. Therefore, section 9.3, introduced earlier, actually specifies that the destination address should only be changed if the received non-probing packet has the largest packet number. This prevents replay attacks where past packets are re-sent with spoofed addresses. Furthermore, QUIC specifies Path Validation in section 8.2. Path validation involves an endpoint sending a PATH_CHALLENGE frame containing data that the peer cannot predict to the new address, and checking whether the peer returns that data in a PATH_RESPONSE frame. Since the peer does not know what data the endpoint will send, it cannot return the data unless it has actually received the PATH_CHALLENGE. Therefore, successfully returning the correct data in a PATH_RESPONSE proves that the PATH_CHALLENGE sent to the new address was received, confirming that the endpoint owns that new address. Additionally, when sending PATH_CHALLENGE, it is also required to use PADDING frames to make the datagram at least 1200 bytes. This is to simultaneously verify that the path's MTU meets the minimum size required for QUIC communication.</p>
 <p>Another point that requires attention is that only the client side can start sending packets on a new path. This measure is in place to prevent confusion caused by both client and server migrating simultaneously, so migration must be initiated from only one side. The reason it is limited to the client side is likely because clients are more often behind NATs. Therefore, the migration flow always begins with the client, as shown below.</p>
@@ -2039,7 +2039,7 @@ async fn next_frame(frames: &amp;mut watch::Receiver&lt;Option&lt;Bytes&gt;&gt;)
     <div class="section post-body">
       <div class="wrap">
         <article class="prose" lang="en">
-<p>SEERA Networks Inc. is developing a product that uses QUIC (<a href="https://github.com/seera-networks/ISEKAI-link" target="_blank" rel="noopener">ISEKAI link</a>). While there are various QUIC implementations, we have adopted MsQuic, developed by Microsoft. The reasons for choosing MsQuic include its support for major platforms such as Windows, Linux, and macOS (macOS is officially best-effort, but it works without issues in practice), its optimization for high throughput and low latency, and the fact that some of our members contribute to MsQuic, which gives us some flexibility.</p>
+<p>Seera Networks is developing a product that uses QUIC (<a href="https://github.com/seera-networks/ISEKAI-link" target="_blank" rel="noopener">ISEKAI link</a>). While there are various QUIC implementations, we have adopted MsQuic, developed by Microsoft. The reasons for choosing MsQuic include its support for major platforms such as Windows, Linux, and macOS (macOS is officially best-effort, but it works without issues in practice), its optimization for high throughput and low latency, and the fact that some of our members contribute to MsQuic, which gives us some flexibility.</p>
 <aside class="msg"><span class="msg-symbol">!</span><div class="msg-content">
 <p>This article discusses the operation of our fork; details on the implementation of each extension will be covered in separate articles.</p>
 </div></aside>
@@ -2356,7 +2356,7 @@ QuicTestProbePath(
       </div>
     </div>
     <div class="footer-bottom">
-      <span>© 2026 <span lang="en">Seera Networks, Inc.</span><span lang="ja">セーラ・ネットワークス株式会社</span></span>
+      <span>© 2026 <span lang="en">Seera Networks</span><span lang="ja">セーラ・ネットワークス株式会社</span></span>
       <span><span lang="en">Japan · San Francisco</span><span lang="ja">日本・サンフランシスコ</span></span>
     </div>
   </div>
